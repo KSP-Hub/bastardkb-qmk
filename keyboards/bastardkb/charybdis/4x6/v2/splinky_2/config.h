@@ -42,7 +42,7 @@
 /* RGB Matrix */
 #define RGB_MATRIX_ENABLE yes
 #define RGB_MATRIX_LED_COUNT 56
-#define RGB_MATRIX_SPLIT { 28, 28 } // Критически важно для split-клавиатуры
+#define RGB_MATRIX_SPLIT { 28, 28 } // Critically important for a split keyboard
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
 #define RGB_MATRIX_HUE_STEP 8
 #define RGB_MATRIX_SAT_STEP 8
