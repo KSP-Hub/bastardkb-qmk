@@ -9,19 +9,15 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Dependencies
+      - name: Install Compiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
-          python3 -m pip install --user qmk
-          python3 -m pip install -r requirements.txt
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi make
 
-      - name: Compile
+      - name: Compile (Direct Mode)
         run: |
-          export PATH=$PATH:~/.local/bin
-          qmk setup -y
-          qmk compile -kb bastardkb/charybdis/4x6/v2/splinky_2 -km wellum
-
+          make bastardkb/charybdis/4x6/v2/splinky_2:wellum
+          
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
