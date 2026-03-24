@@ -12,3 +12,4 @@ jobs:
         with:
           keyboard: bastardkb/charybdis/4x6/v2/splinky_2
           keymap: wellum
+          branch: 2024-04-08-bkb-master
