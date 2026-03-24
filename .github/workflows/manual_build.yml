@@ -9,14 +9,17 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install QMK
+      - name: Install Dependencies
         run: |
-          sudo util/qmk_install.sh
-          python3 -m pip install qmk
-          qmk setup -y
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+          python3 -m pip install --user qmk
+          python3 -m pip install -r requirements.txt
 
       - name: Compile
         run: |
+          export PATH=$PATH:~/.local/bin
+          qmk setup -y
           qmk compile -kb bastardkb/charybdis/4x6/v2/splinky_2 -km wellum
 
       - name: Upload Artifact
