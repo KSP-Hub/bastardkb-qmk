@@ -1,28 +1,37 @@
-name: Manual Build Wellum
-on: [workflow_dispatch]
+name: QMK Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      keymap:
+        description: 'Keymap name'
+        required: true
+        default: 'wellum'
+      keyboard:
+        description: 'Keyboard name'
+        required: true
+        default: 'bastardkb/charybdis/4x6/v2/splinky_2'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install Compiler
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi make
-
-      - name: Compile Direct
-        run: |
-          make bastardkb/charybdis/4x6/v2/splinky_2:wellum
-          
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: charybdis_firmware
-          path: |
-            *.uf2
-            *.bin
-            *.hex
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Build QMK firmware
+      uses: qmk/qmk_action@master
+      with:
+        keyboard: ${{ github.event.inputs.keyboard }}
+        keymap: ${{ github.event.inputs.keymap }}
+        
+    - name: Upload firmware
+      uses: actions/upload-artifact@v3
+      with:
+        name: firmware
+        path: |
+          qmk_firmware/.build/*.hex
+          qmk_firmware/.build/*.bin
+          qmk_firmware/.build/*.uf2
