@@ -8,8 +8,7 @@ jobs:
         with:
           submodules: recursive
       - name: Compile
-        uses: qmk/qmk-action@v5
+        uses: qmk/qmk_firmware/.github/actions/compile@master
         with:
           keyboard: bastardkb/charybdis/4x6/v2/splinky_2
           keymap: wellum
-          branch: 2024-04-08-bkb-master
