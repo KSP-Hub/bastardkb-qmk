@@ -1,9 +1,9 @@
 #include QMK_KEYBOARD_H
 
-// Включаем проброс RGB на правую сторону
+// Настройка RGB для двух половин
 #ifdef RGB_MATRIX_ENABLE
 #    define RGB_MATRIX_SPLIT
-#    define RGBLED_SPLIT { 35, 35 } // Укажи свое кол-во диодов
+#    define RGBLED_SPLIT { 35, 35 } 
 #endif
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
