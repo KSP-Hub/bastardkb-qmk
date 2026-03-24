@@ -15,6 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* RGB Matrix */
+#define RGB_MATRIX_ENABLE yes
+#define RGB_MATRIX_LED_COUNT 56
+#define RGB_MATRIX_SPLIT { 28, 28 } // Critically important for a split keyboard
+#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
+#define RGB_MATRIX_HUE_STEP 8
+#define RGB_MATRIX_SAT_STEP 8
+#define RGB_MATRIX_VAL_STEP 8
+#define RGB_MATRIX_SPD_STEP 10
+#define RGB_DISABLE_WHEN_USB_SUSPENDED
+#define RGB_MATRIX_KEYPRESSES
+#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
+#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
+
 #pragma once
 
 /* Handedness. */
@@ -38,17 +52,3 @@
 /* Reset. */
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_LED GP17
-
-/* RGB Matrix */
-#define RGB_MATRIX_ENABLE yes
-#define RGB_MATRIX_LED_COUNT 56
-#define RGB_MATRIX_SPLIT { 28, 28 } // Critically important for a split keyboard
-#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
-#define RGB_MATRIX_HUE_STEP 8
-#define RGB_MATRIX_SAT_STEP 8
-#define RGB_MATRIX_VAL_STEP 8
-#define RGB_MATRIX_SPD_STEP 10
-#define RGB_DISABLE_WHEN_USB_SUSPENDED
-#define RGB_MATRIX_KEYPRESSES
-#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
-#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
