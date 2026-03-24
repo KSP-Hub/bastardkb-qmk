@@ -1,0 +1,14 @@
+name: Manual Build Wellum
+on: [workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Compile
+        uses: qmk/qmk-action@v5
+        with:
+          keyboard: bastardkb/charybdis/4x6/v2/splinky_2
+          keymap: wellum
