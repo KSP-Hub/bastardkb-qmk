@@ -24,7 +24,7 @@ jobs:
       with:
         submodules: recursive
         
-    - name: DEBUG: Show repository structure
+    - name: DEBUG Show repository structure
       run: |
         echo "===== Repository structure ====="
         ls -la
