@@ -54,6 +54,6 @@ jobs:
       with:
         name: firmware
         path: |
-          *.hex
-          *.bin
-          *.uf2
+          .build/*.hex
+          .build/*.bin
+          .build/*.uf2
