@@ -1,6 +1,6 @@
 #include "qmk_keyboard.h"
+#include <avr/pgmspace.h>  // Добавлено для pgm_read_word
 
-// Добавляем определение KC_TRNS, если оно отсутствует
 #ifndef KC_TRNS
 #   define KC_TRNS 0xFFFF
 #endif
