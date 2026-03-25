@@ -22,7 +22,7 @@ jobs:
         submodules: recursive
         
     - name: Build QMK firmware
-      uses: qmk/qmk-action@master
+      uses: qmk/qmk-action@main
       with:
         keyboard: ${{ github.event.inputs.keyboard }}
         keymap: ${{ github.event.inputs.keymap }}
