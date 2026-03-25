@@ -1,14 +1,17 @@
 #include "qmk_keyboard.h"
 
+// Добавляем определение KC_TRNS, если оно отсутствует
+#ifndef KC_TRNS
+#   define KC_TRNS 0xFFFF
+#endif
+
 #ifdef RGB_MATRIX_ENABLE
 void keyboard_post_init_user(void) {
-    // Используем стандартные функции без _noeeprom
     rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
     rgb_matrix_set_color_all(RGB_WHITE);
 }
 #endif
 
-// Убедимся, что количество клавиш соответствует 56 физическим клавишам
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_charybdis_4x6(
         KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
