@@ -24,7 +24,7 @@ jobs:
       with:
         submodules: recursive
         
-    - name: DEBUG Show repository structure
+    - name: "DEBUG: Show repository structure"
       run: |
         echo "===== Repository structure ====="
         ls -la
@@ -33,7 +33,7 @@ jobs:
         echo "\n===== QMK directory structure ====="
         ls -la keyboards/bastardkb/charybdis/4x6/v2/splinky_2
         ls -la keyboards/bastardkb/charybdis/4x6/v2/splinky_2/keymaps/wellum
-        
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
@@ -45,15 +45,20 @@ jobs:
         python3 -m pip install qmk
         qmk setup -y
         
-    - name: Build firmware (VERBOSE MODE)
+    - name: "Build firmware (VERBOSE MODE)"
       run: |
-        qmk -V compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+        qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+        
+    - name: Check build directory contents
+      run: |
+        echo "===== Contents of .build directory ====="
+        ls -la .build || echo "Directory not found"
+        echo "\n===== Looking for firmware files ====="
+        find . -name "*wellum.*"
         
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
         name: firmware
         path: |
-          .build/*.hex
-          .build/*.bin
-          .build/*.uf2
+          .build/*wellum.*
