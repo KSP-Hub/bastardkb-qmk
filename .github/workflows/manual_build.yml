@@ -12,6 +12,10 @@ on:
         required: true
         default: 'bastardkb/charybdis/4x6/v2/splinky_2'
 
+env:
+  # Решает проблему с deprecated Node.js 20
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
