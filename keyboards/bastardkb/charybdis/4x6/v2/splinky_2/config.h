@@ -16,10 +16,18 @@
  */
 
 /* RGB Matrix */
+#undef RGB_MATRIX_ENABLE
 #define RGB_MATRIX_ENABLE yes
+
+#undef RGB_MATRIX_LED_COUNT
 #define RGB_MATRIX_LED_COUNT 56
-#define RGB_MATRIX_SPLIT { 29, 27 } // КРИТИЧЕСКИ Важно! Не 28, 28
+
+#undef RGB_MATRIX_SPLIT
+#define RGB_MATRIX_SPLIT { 29, 27 } // КРИТИЧЕСКИ ВАЖНО для вашей конфигурации
+
+#undef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
+
 #define RGB_MATRIX_KEYPRESSES
 #define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
