@@ -1,6 +1,6 @@
 /* RGB Matrix */
 #undef RGB_MATRIX_ENABLE
-#define RGB_MATRIX_ENABLE yes
+#define RGB_MATRIX_ENABLE true
 
 #undef RGB_MATRIX_LED_COUNT
 #define RGB_MATRIX_LED_COUNT 58  // Стандартное значение для Charybdis 4x6
