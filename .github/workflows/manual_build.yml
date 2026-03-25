@@ -24,6 +24,16 @@ jobs:
       with:
         submodules: recursive
         
+    - name: DEBUG: Show repository structure
+      run: |
+        echo "===== Repository structure ====="
+        ls -la
+        echo "\n===== Submodules status ====="
+        git submodule status
+        echo "\n===== QMK directory structure ====="
+        ls -la keyboards/bastardkb/charybdis/4x6/v2/splinky_2
+        ls -la keyboards/bastardkb/charybdis/4x6/v2/splinky_2/keymaps/wellum
+        
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
@@ -35,9 +45,9 @@ jobs:
         python3 -m pip install qmk
         qmk setup -y
         
-    - name: Build firmware
+    - name: Build firmware (VERBOSE MODE)
       run: |
-        qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+        qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} -v
         
     - name: Upload firmware
       uses: actions/upload-artifact@v4
