@@ -11,8 +11,6 @@
 #define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
 
-/* УДАЛИТЬ ЭТУ СТРОКУ: #define WS2812_DI_PIN GP0 */
-
 /* Handedness */
 #define MASTER_RIGHT
 
