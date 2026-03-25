@@ -1,9 +1,4 @@
 #include "qmk_keyboard.h"
-#include <avr/pgmspace.h>  // Добавлено для pgm_read_word
-
-#ifndef KC_TRNS
-#   define KC_TRNS 0xFFFF
-#endif
 
 #ifdef RGB_MATRIX_ENABLE
 void keyboard_post_init_user(void) {
