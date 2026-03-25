@@ -20,10 +20,10 @@
 #define RGB_MATRIX_ENABLE yes
 
 #undef RGB_MATRIX_LED_COUNT
-#define RGB_MATRIX_LED_COUNT 56
+#define RGB_MATRIX_LED_COUNT 58
 
 #undef RGB_MATRIX_SPLIT
-#define RGB_MATRIX_SPLIT { 29, 27 } // КРИТИЧЕСКИ ВАЖНО для вашей конфигурации
+#define RGB_MATRIX_SPLIT { 29, 29 }
 
 #undef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
