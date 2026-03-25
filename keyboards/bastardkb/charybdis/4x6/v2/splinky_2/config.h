@@ -7,11 +7,27 @@
 #define RGB_MATRIX_SPLIT { 29, 29 }
 #undef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
-
-// Добавлены недостающие определения для WS2812
-#define RGB_DI_PIN GP0
-#define DRIVER_LED_TOTAL 58
-#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
-
 #define RGB_MATRIX_KEYPRESSES
 #define RGB_MATRIX_FRAMEBUFFER_EFFECTS
+#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
+
+/* Замена устаревшего RGB_DI_PIN на WS2812_DI_PIN */
+#undef WS2812_DI_PIN
+#define WS2812_DI_PIN GP0
+
+/* Добавление недостающего PMW33XX_CS_PIN */
+#undef PMW33XX_CS_PIN
+#define PMW33XX_CS_PIN GP14
+
+/* Handedness */
+#define MASTER_RIGHT
+
+/* VBUS detection */
+#define USB_VBUS_PIN GP25
+
+/* SPI & PMW3360 settings */
+#define SPI_DRIVER SPID0
+#define SPI_SCK_PIN GP18
+#define SPI_MISO_PIN GP20
+#define SPI_MOSI_PIN GP19
+#define POINTING_DEVICE_CS_PIN GP14
