@@ -1,35 +1,27 @@
 /* RGB Matrix */
 #undef RGB_MATRIX_ENABLE
 #define RGB_MATRIX_ENABLE true
-
 #undef RGB_MATRIX_LED_COUNT
-#define RGB_MATRIX_LED_COUNT 58  // Стандартное значение для Charybdis 4x6
-
+#define RGB_MATRIX_LED_COUNT 58
 #undef RGB_MATRIX_SPLIT
-#define RGB_MATRIX_SPLIT { 29, 29 }  // Стандартное разделение для QMK
-
+#define RGB_MATRIX_SPLIT { 29, 29 }
 #undef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
-
 #define RGB_MATRIX_KEYPRESSES
 #define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
 
 #pragma once
-
 /* Handedness. */
 #define MASTER_RIGHT
-
 /* VBUS detection. */
 #define USB_VBUS_PIN GP25
-
 /* SPI & PMW3360 settings. */
 #define SPI_DRIVER SPID0
 #define SPI_SCK_PIN GP18
 #define SPI_MISO_PIN GP20
 #define SPI_MOSI_PIN GP19
 #define POINTING_DEVICE_CS_PIN GP14
-
 /* Reset. */
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_LED GP17
