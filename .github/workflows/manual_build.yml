@@ -47,7 +47,7 @@ jobs:
         
     - name: Build firmware (VERBOSE MODE)
       run: |
-        qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} -v
+        qmk -V compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
         
     - name: Upload firmware
       uses: actions/upload-artifact@v4
