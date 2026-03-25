@@ -11,13 +11,7 @@
 #define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
 
-/* Замена устаревшего RGB_DI_PIN на WS2812_DI_PIN */
-#undef WS2812_DI_PIN
-#define WS2812_DI_PIN GP0
-
-/* Добавление недостающего PMW33XX_CS_PIN */
-#undef PMW33XX_CS_PIN
-#define PMW33XX_CS_PIN GP14
+/* УДАЛИТЬ ЭТУ СТРОКУ: #define WS2812_DI_PIN GP0 */
 
 /* Handedness */
 #define MASTER_RIGHT
