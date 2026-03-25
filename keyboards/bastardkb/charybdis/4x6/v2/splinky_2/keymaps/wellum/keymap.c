@@ -1,4 +1,4 @@
-#include "qmk_keyboard.h"
+#include QMK_KEYBOARD_H
 
 #ifdef RGB_MATRIX_ENABLE
 void keyboard_post_init_user(void) {
