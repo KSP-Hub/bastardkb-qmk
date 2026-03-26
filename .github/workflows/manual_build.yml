@@ -36,7 +36,12 @@ jobs:
         run: |
           echo "Starting compilation... "
           qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
-          echo "Compilation completed with exit code $? "
+          EXIT_CODE=$?
+          echo "Compilation completed with exit code $EXIT_CODE "
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "::error::Compilation failed with exit code $EXIT_CODE"
+            exit $EXIT_CODE
+          fi
           
       - name: List build directory
         if: always()
