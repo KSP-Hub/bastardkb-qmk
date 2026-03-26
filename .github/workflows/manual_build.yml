@@ -34,24 +34,24 @@ jobs:
       - name: Compile firmware
         id: compile
         run: |
-          echo "Starting compilation..."
+          echo "Starting compilation... "
           qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
-          echo "Compilation completed with exit code $?"
+          echo "Compilation completed with exit code $? "
           
       - name: List build directory
         if: always()
         run: |
-          echo "Checking build directory contents..."
+          echo "Checking build directory contents... "
           pwd
           ls -la
           if [ -d ".build" ]; then
-            echo "Contents of .build directory:"
-            ls -la .build
+            echo "Contents of .build directory: "
+            find .build -ls
           else
-            echo ".build directory does not exist"
+            echo ".build directory does not exist "
           fi
           
-          echo "Searching for firmware files in entire workspace..."
+          echo "Searching for firmware files in entire workspace... "
           find . -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
         
       - name: Upload firmware
@@ -60,7 +60,7 @@ jobs:
         with:
           name: firmware
           path: |
-            .build/*.uf2
-            .build/*.hex
-            .build/*.bin
+            .build/**/*.uf2
+            .build/**/*.hex
+            .build/**/*.bin
           if-no-files-found: error
