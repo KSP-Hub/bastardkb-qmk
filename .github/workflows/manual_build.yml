@@ -70,21 +70,14 @@ jobs:
           find . -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
           
           echo "==================== END OF DIAGNOSTIC ===================="
-        
+
       - name: Upload firmware
         if: "success() && steps.compile.conclusion == 'success'"
         uses: actions/upload-artifact@v4
         with:
           name: firmware
           path: |
-            .build/*.uf2
-          if-no-files-found: warn
-      - name: Upload firmware
-        if: "success() && steps.compile.conclusion == 'success'"
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware
-          path: |
+            .build/**/bastardkb_charybdis_4x6_v2_splinky_2_wellum.uf2
             .build/*.uf2
             *.uf2
-          if-no-files-found: warn
+          if-no-files-found: error
