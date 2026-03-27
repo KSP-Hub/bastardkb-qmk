@@ -38,18 +38,11 @@ jobs:
       - name: List build directory
         if: always()
         run: |
-          echo "Checking build directory contents... "
-          pwd
-          ls -la
+          echo "Checking build directory contents..."
+          ls -la .build || echo "Build directory does not exist"
           if [ -d ".build" ]; then
-            echo "Contents of .build directory: "
             ls -la .build
-          else
-            echo ".build directory does not exist "
           fi
-          
-          echo "Searching for firmware files in entire workspace... "
-          find . -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
         
       - name: Upload firmware
         if: success() && steps.compile.conclusion == 'success'
