@@ -8,7 +8,7 @@ on:
         required: true
         default: 'bastardkb/charybdis/4x6/v2/splinky_2'
       keymap:
-        description: 'Keymap name (e.g. "default")'
+        description: 'Keymap name (e.g. "wellum")'
         required: true
         default: 'wellum'
 
@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          
+           
       - name: Install QMK
         run: |
           python3 -m pip install qmk
@@ -33,16 +33,43 @@ jobs:
         
       - name: Compile firmware
         id: compile
-        run: qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+        run: |
+          echo "Starting compilation..."
+          qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+          EXIT_CODE=$?
+          echo "Compilation completed with exit code $EXIT_CODE"
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "::error::Compilation failed with exit code $EXIT_CODE"
+            exit $EXIT_CODE
+          fi
         
-      - name: List build directory
+      # ДИАГНОСТИЧЕСКИЙ ШАГ (КРИТИЧЕСКИ ВАЖНЫЙ)
+      - name: DIAGNOSTIC: Check build directory contents
         if: always()
         run: |
-          echo "Checking build directory contents..."
-          ls -la .build || echo "Build directory does not exist"
+          echo "==================== DIAGNOSTIC INFORMATION ===================="
+          echo "Current working directory:"
+          pwd
+          
+          echo -e "\nDirectory structure of workspace:"
+          ls -la
+          
+          echo -e "\nChecking if .build directory exists:"
           if [ -d ".build" ]; then
-            ls -la .build
+            echo ".build directory exists!"
+            echo -e "\nContents of .build directory:"
+            ls -laR .build
+            
+            echo -e "\nSearching for firmware files in .build:"
+            find .build -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
+          else
+            echo ".build directory DOES NOT EXIST!"
           fi
+          
+          echo -e "\nSearching for firmware files in entire workspace:"
+          find . -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
+          
+          echo "==================== END OF DIAGNOSTIC ===================="
         
       - name: Upload firmware
         if: success() && steps.compile.conclusion == 'success'
