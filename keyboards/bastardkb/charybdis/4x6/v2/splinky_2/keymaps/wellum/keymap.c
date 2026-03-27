@@ -47,20 +47,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 #ifdef VIA_ENABLE
-enum via_layers {
-    LAYER_BASE = 0,
-    LAYER_FN1,
-    LAYER_FN2,
-    LAYER_VIA
-};
-
-const uint16_t *const PROGMEM vias[] = {
-    [LAYER_BASE] = keymaps[_BASE],
-    [LAYER_FN1] = keymaps[_FN1],
-    [LAYER_FN2] = keymaps[_FN2],
-    [LAYER_VIA] = keymaps[_BASE]
-};
-
 void via_custom_set_value(uint8_t page_id, uint8_t slot_id, uint8_t data[]) {
     // Custom config values
 }
