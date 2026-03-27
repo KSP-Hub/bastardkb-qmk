@@ -44,7 +44,7 @@ jobs:
           fi
         
       # ДИАГНОСТИЧЕСКИЙ ШАГ (КРИТИЧЕСКИ ВАЖНЫЙ)
-      - name: DIAGNOSTIC - Check build directory contents
+      - name: DIAGNOSTIC Check build directory contents
         if: always()
         run: |
           echo "==================== DIAGNOSTIC INFORMATION ===================="
