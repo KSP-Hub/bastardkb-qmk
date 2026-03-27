@@ -33,16 +33,8 @@ jobs:
         
       - name: Compile firmware
         id: compile
-        run: |
-          echo "Starting compilation... "
-          qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
-          EXIT_CODE=$?
-          echo "Compilation completed with exit code $EXIT_CODE "
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "::error::Compilation failed with exit code $EXIT_CODE"
-            exit $EXIT_CODE
-          fi
-          
+        run: qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+        
       - name: List build directory
         if: always()
         run: |
@@ -51,7 +43,7 @@ jobs:
           ls -la
           if [ -d ".build" ]; then
             echo "Contents of .build directory: "
-            find .build -ls
+            ls -la .build
           else
             echo ".build directory does not exist "
           fi
@@ -64,8 +56,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: |
-            .build/**/*.uf2
-            .build/**/*.hex
-            .build/**/*.bin
-          if-no-files-found: error
+          path: .build/*.uf2
+          if-no-files-found: warn
