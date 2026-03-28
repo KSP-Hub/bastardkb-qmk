@@ -25,11 +25,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          
+      - name: Install ARM toolchain
+        run: |
+          qmk setup -y arm-none-eabi
            
       - name: Install QMK
         run: |
           python3 -m pip install qmk
           qmk setup -y
+          qmk setup -y arm-none-eabi
         
       - name: Compile firmware
         id: compile
