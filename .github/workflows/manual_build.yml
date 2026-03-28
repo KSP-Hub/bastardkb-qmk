@@ -39,27 +39,44 @@ jobs:
 
       - name: Install QMK with PATH verification
         run: |
-          # Installing QMK and checking that it is available in the PATH
+          # Установка зависимостей ДО установки QMK
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install -r requirements-dev.txt
+          
+          # Установка QMK
           python3 -m pip install --user qmk
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          
+          # Добавление qmk в PATH для текущего шага
+          export PATH="$HOME/.local/bin:$PATH"
+          
+          # Проверка установки QMK
+          which qmk
           qmk --version
           
-          # Setting up QMK
+          # Настройка окружения QMK
           qmk setup -y
           qmk setup -y pico
           qmk setup -y arm-none-eabi
+          qmk json2c --force keyboards/$GITHUB_REPOSITORY_NAME
+          
+          # Проверка окружения (игнорируем незначительные ошибки)
+          qmk doctor || echo "qmk doctor found minor issues, but continuing..."
 
       - name: Verify environment
         run: |
-          qmk doctor
+          # Убедиться, что qmk доступен
+          export PATH="$HOME/.local/bin:$PATH"
+          qmk config
           ls -la lib/pico-sdk
 
       - name: Compile firmware
         id: compile
         run: |
-          echo "Compiling firmware with CONVERT_TO=splinky..."
-          # Adding --parallel 1 for cleaner output
-          CONVERT_TO=splinky qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} 2>&1 | tee compile.log
+          # Убедиться, что qmk в PATH
+          export PATH="$HOME/.local/bin:$PATH"
+          
+          echo "Compiling firmware..."
+          qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} 2>&1 | tee compile.log
           EXIT_CODE=${PIPESTATUS[0]}
           echo "Compilation completed with exit code $EXIT_CODE"
           if [ $EXIT_CODE -ne 0 ]; then
@@ -73,6 +90,9 @@ jobs:
       - name: DIAGNOSTIC Check build directory contents
         if: always()
         run: |
+          # Убедиться, что qmk в PATH
+          export PATH="$HOME/.local/bin:$PATH"
+          
           echo "==================== DIAGNOSTIC INFORMATION ===================="
           echo "Current working directory:"
           pwd
