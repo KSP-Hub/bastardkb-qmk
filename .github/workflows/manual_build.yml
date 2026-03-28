@@ -78,4 +78,5 @@ jobs:
           name: firmware
           path: |
             .build/**/*rp2040*.uf2
+            .build/**/*.uf2
           if-no-files-found: error
