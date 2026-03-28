@@ -35,16 +35,18 @@ jobs:
           python3 -m pip install qmk
           qmk setup -y
           qmk setup -y arm-none-eabi
-        
+
       - name: Compile firmware
         id: compile
         run: |
           echo "Starting compilation..."
-          qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
-          EXIT_CODE=$?
+          qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} | tee compile.log
+          EXIT_CODE=${PIPESTATUS[0]}
           echo "Compilation completed with exit code $EXIT_CODE"
           if [ $EXIT_CODE -ne 0 ]; then
             echo "::error::Compilation failed with exit code $EXIT_CODE"
+            echo "Detailed error log:"
+            cat compile.log
             exit $EXIT_CODE
           fi
         
