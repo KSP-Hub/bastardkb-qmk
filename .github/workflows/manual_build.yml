@@ -26,17 +26,28 @@ jobs:
         with:
           python-version: '3.12'
           
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git python3-pip libnewlib-arm-none-eabi libstdc++-arm-none-eabi-dev
+          sudo apt-get install -y build-essential git python3-pip
+          # ARM tools for RP2040
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+          # AVR tools (QMK is required even for ARM builds)
           sudo apt-get install -y avr-libc avrdude binutils-avr dfu-programmer dfu-util gcc-avr
+          # Additional tools for Pico SDK
+          sudo apt-get install -y libusb-1.0-0-dev libusb-dev
 
-      - name: Install QMK
+      - name: Install QMK with PATH verification
         run: |
-          python3 -m pip install qmk
+          # Installing QMK and checking that it is available in the PATH
+          python3 -m pip install --user qmk
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          qmk --version
+          
+          # Setting up QMK
           qmk setup -y
           qmk setup -y pico
+          qmk setup -y arm-none-eabi
 
       - name: Verify environment
         run: |
@@ -47,6 +58,7 @@ jobs:
         id: compile
         run: |
           echo "Compiling firmware with CONVERT_TO=splinky..."
+          # Adding --parallel 1 for cleaner output
           CONVERT_TO=splinky qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} 2>&1 | tee compile.log
           EXIT_CODE=${PIPESTATUS[0]}
           echo "Compilation completed with exit code $EXIT_CODE"
@@ -84,6 +96,7 @@ jobs:
           find . -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
           
           echo "==================== END OF DIAGNOSTIC ===================="
+          echo "PATH: $PATH"
 
       - name: Upload firmware
         if: "success() && steps.compile.conclusion == 'success'"
