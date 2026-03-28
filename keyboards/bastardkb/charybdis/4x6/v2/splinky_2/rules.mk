@@ -6,7 +6,7 @@ PLATFORM = ARM
 PLATFORM_KEY = arm
 ARM_GCC_VERSION = 10
 OPT_DEFS += -DARM
-CONVERT_TO = splinky_2
+CONVERT_TO = splinky
 
 # Core features
 SPLIT_KEYBOARD = yes
