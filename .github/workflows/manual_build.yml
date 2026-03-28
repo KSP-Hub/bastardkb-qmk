@@ -37,17 +37,17 @@ jobs:
           # Additional tools for Pico SDK
           sudo apt-get install -y libusb-1.0-0-dev libusb-dev
 
-      - name: Install QMK with PATH verification
+      - name: Install QMK dependencies
         run: |
-          # Установка зависимостей ДО установки QMK
-          python3 -m pip install -r requirements.txt
-          python3 -m pip install -r requirements-dev.txt
+          # Установка зависимостей из корня репозитория
+          python3 -m pip install -r $GITHUB_WORKSPACE/requirements.txt
+          python3 -m pip install -r $GITHUB_WORKSPACE/requirements-dev.txt
           
           # Установка QMK
           python3 -m pip install --user qmk
           
-          # Добавление qmk в PATH для текущего шага
-          export PATH="$HOME/.local/bin:$PATH"
+          # Добавление qmk в PATH для всех последующих шагов
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
           
           # Проверка установки QMK
           which qmk
@@ -57,42 +57,45 @@ jobs:
           qmk setup -y
           qmk setup -y pico
           qmk setup -y arm-none-eabi
-          qmk json2c --force keyboards/$GITHUB_REPOSITORY_NAME
+          qmk json2c --force keyboards/${{ github.repository }}
           
-          # Проверка окружения (игнорируем незначительные ошибки)
-          qmk doctor || echo "qmk doctor found minor issues, but continuing..."
+          # Проверка окружения
+          qmk doctor
 
-      - name: Verify environment
+      - name: Determine firmware filename
+        id: firmware-filename
         run: |
-          # Убедиться, что qmk доступен
-          export PATH="$HOME/.local/bin:$PATH"
-          qmk config
-          ls -la lib/pico-sdk
+          # Форматируем имя файла прошивки: заменяем / на _ и добавляем расширение
+          FIRMWARE_FILENAME=$(echo ${{ github.event.inputs.keyboard }} | tr '/' '_' )_${{ github.event.inputs.keymap }}.uf2
+          echo "FIRMWARE_FILENAME=$FIRMWARE_FILENAME" >> $GITHUB_OUTPUT
+          echo "Firmware file will be: $FIRMWARE_FILENAME"
 
       - name: Compile firmware
         id: compile
         run: |
-          # Убедиться, что qmk в PATH
-          export PATH="$HOME/.local/bin:$PATH"
-          
-          echo "Compiling firmware..."
+          echo "Compiling firmware for ${{ github.event.inputs.keyboard }} with keymap ${{ github.event.inputs.keymap }}"
           qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} 2>&1 | tee compile.log
           EXIT_CODE=${PIPESTATUS[0]}
           echo "Compilation completed with exit code $EXIT_CODE"
+          
           if [ $EXIT_CODE -ne 0 ]; then
             echo "::error::Compilation failed with exit code $EXIT_CODE"
             echo "Detailed error log:"
             cat compile.log
             exit $EXIT_CODE
           fi
-        
+          
+          # Проверка наличия файла прошивки
+          if [ ! -f ".build/${{ steps.firmware-filename.outputs.FIRMWARE_FILENAME }}" ]; then
+            echo "::error::Firmware file not found: .build/${{ steps.firmware-filename.outputs.FIRMWARE_FILENAME }}"
+            ls -la .build
+            exit 1
+          fi
+
       # DIAGNOSTIC STEP (CRITICAL)
       - name: DIAGNOSTIC Check build directory contents
         if: always()
         run: |
-          # Убедиться, что qmk в PATH
-          export PATH="$HOME/.local/bin:$PATH"
-          
           echo "==================== DIAGNOSTIC INFORMATION ===================="
           echo "Current working directory:"
           pwd
@@ -123,8 +126,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: |
-            .build/**/*splinky*.uf2
-            .build/**/*rp2040*.uf2
-            .build/**/*.uf2
+          path: .build/${{ steps.firmware-filename.outputs.FIRMWARE_FILENAME }}
           if-no-files-found: error
