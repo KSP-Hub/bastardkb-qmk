@@ -77,7 +77,6 @@ jobs:
         with:
           name: firmware
           path: |
-            .build/**/bastardkb_charybdis_4x6_v2_splinky_2_wellum.uf2
-            .build/*.uf2
-            *.uf2
+            .build/**/*rp2040*.uf2
+            .build/**/*splinky*.uf2
           if-no-files-found: error
