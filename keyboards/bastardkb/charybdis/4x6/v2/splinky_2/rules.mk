@@ -15,6 +15,13 @@ SERIAL_DRIVER = vendor
 # QMK features
 QMK_SETTINGS = yes
 
+# Memory optimization
+BOOTMAGIC_ENABLE = no
+MOUSEKEY_ENABLE = no
+EXTRAKEY_ENABLE = no
+CONSOLE_ENABLE = no
+COMMAND_ENABLE = no
+
 # RGB features
 RGB_MATRIX_ENABLE = yes
 RGB_MATRIX_KEYPRESSES = yes
