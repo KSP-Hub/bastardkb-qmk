@@ -6,7 +6,7 @@ PLATFORM = ARM
 PLATFORM_KEY = arm
 ARM_GCC_VERSION = 10
 OPT_DEFS += -DARM
-CONVERT_TO = rp2040
+CONVERT_TO = splinky_2
 
 # Core features
 SPLIT_KEYBOARD = yes
