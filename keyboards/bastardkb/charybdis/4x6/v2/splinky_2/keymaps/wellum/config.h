@@ -1,5 +1,3 @@
-#define RGB_MATRIX_SPLIT { 29, 29 }
-
 #pragma once
 
 #define TAPPING_TERM 150
