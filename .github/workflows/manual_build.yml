@@ -26,30 +26,28 @@ jobs:
         with:
           python-version: '3.12'
           
-      - name: Install QMK and dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git python3-pip libnewlib-arm-none-eabi libstdc++-arm-none-eabi-dev
+          sudo apt-get install -y avr-libc avrdude binutils-avr dfu-programmer dfu-util gcc-avr
+
+      - name: Install QMK
+        run: |
           python3 -m pip install qmk
           qmk setup -y
-          qmk doctor
-          # CRITICALLY IMPORTANT: Installing the Raspberry Pi Pico SDK
           qmk setup -y pico
 
-      - name: Install QMK and dependencies
+      - name: Verify environment
         run: |
-          if [ ! -d "lib/pico-sdk" ]; then
-            echo "::error::Pico SDK not installed correctly!"
-            exit 1
-          fi
+          qmk doctor
+          ls -la lib/pico-sdk
 
       - name: Compile firmware
         id: compile
         run: |
-          CONVERT_TO=splinky qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} | tee compile.log
-          echo "Starting compilation..."
-          # Adding detailed output for better diagnostics
-          qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} -c CONVERT_TO=splinky 2>&1 | tee compile.log
+          echo "Compiling firmware with CONVERT_TO=splinky..."
+          CONVERT_TO=splinky qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} 2>&1 | tee compile.log
           EXIT_CODE=${PIPESTATUS[0]}
           echo "Compilation completed with exit code $EXIT_CODE"
           if [ $EXIT_CODE -ne 0 ]; then
