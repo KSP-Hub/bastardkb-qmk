@@ -12,6 +12,9 @@ CONVERT_TO = rp2040
 SPLIT_KEYBOARD = yes
 SERIAL_DRIVER = vendor
 
+# QMK features
+QMK_SETTINGS = yes
+
 # RGB features
 RGB_MATRIX_ENABLE = yes
 RGB_MATRIX_KEYPRESSES = yes
