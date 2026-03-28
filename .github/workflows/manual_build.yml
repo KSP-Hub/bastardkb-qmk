@@ -33,12 +33,23 @@ jobs:
           python3 -m pip install qmk
           qmk setup -y
           qmk doctor
+          # CRITICALLY IMPORTANT: Installing the Raspberry Pi Pico SDK
+          qmk setup -y pico
+
+      - name: Install QMK and dependencies
+        run: |
+          if [ ! -d "lib/pico-sdk" ]; then
+            echo "::error::Pico SDK not installed correctly!"
+            exit 1
+          fi
 
       - name: Compile firmware
         id: compile
         run: |
+          CONVERT_TO=splinky qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} | tee compile.log
           echo "Starting compilation..."
-          qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} | tee compile.log
+          # Adding detailed output for better diagnostics
+          qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} -c CONVERT_TO=splinky 2>&1 | tee compile.log
           EXIT_CODE=${PIPESTATUS[0]}
           echo "Compilation completed with exit code $EXIT_CODE"
           if [ $EXIT_CODE -ne 0 ]; then
