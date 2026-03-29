@@ -41,7 +41,7 @@ jobs:
           python3 -m pip install -r requirements-dev.txt
           
           # Теперь устанавливаем QMK
-          python3 -m pip install --user qmk
+          python3 -m pip install qmk
           
           # Добавляем qmk в PATH
           echo "$HOME/.local/bin" >> $GITHUB_PATH
