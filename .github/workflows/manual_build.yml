@@ -49,6 +49,9 @@ jobs:
       # =====================Install QMK dependencies=====================
       - name: Install QMK dependencies
         run: |
+          # =====================First, install appdirs explicitly (Сначала устанавливаем appdirs явно)=====================
+          python3 -m pip install --user qmk
+
           # =====================Installing dependencies BEFORE installing QMK (Установка зависимостей ДО установки QMK)=====================
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-dev.txt
@@ -92,28 +95,34 @@ jobs:
         id: firmware-filename
         run: |
           
-          # =====================We automatically determine the name of the firmware file based on the qmk output=====================
-          BUILD_DIR=$(qmk path | grep "Build directory" | awk '{print $3}')
-          FIRMWARE_FILE=$(find $BUILD_DIR -name "*.uf2" | head -n 1)
-          if [ -z "$FIRMWARE_FILE" ]; then
-           echo "Firmware file not found!"
-           exit 1
+          # =====================We use the standard QMK path for firmware (Используем стандартный путь QMK для прошивок)=====================
+          FIRMWARE_FILE=".build/${{ github.event.inputs.keyboard }}_${{github.event.inputs.keymap }}.uf2"
+    
+          if [ ! -f "$FIRMWARE_FILE" ]; then
+          # =====================Let's try an alternative way (Попробуем альтернативный путь)=====================
+          FIRMWARE_FILE=".build/${{ github.event.inputs.keyboard }}_${{ github.event.inputs.keymap }}.hex"
           fi
+    
+          if [ ! -f "$FIRMWARE_FILE" ]; then
+            echo "Firmware file not found!"
+            exit 1
+          fi
+    
           echo "FIRMWARE_PATH=$FIRMWARE_FILE" >> $GITHUB_OUTPUT
-          echo "Firmware file found at: $FIRMWARE_FILE"
+          echo "Firmware will be at: $FIRMWARE_FILE"
       
       # =====================Determining the path to the firmware=====================
       - name: Determine firmware path
         id: firmware-path
         run: |
-          # =====================Dynamically determine the path to the firmware file=====================
+          # =====================Dynamically determine the path to the firmware file (Динамическое определение пути к файлу встроенного ПО)=====================
           BUILD_DIR=$(qmk path | grep "Build directory" | awk '{print $3}')
           if [ -z "$BUILD_DIR" ]; then
             echo "Build directory not found in qmk path output"
             exit 1
           fi
     
-          # =====================We are looking for the firmware files in the build directory=====================
+          # =====================We are looking for the firmware files in the build directory (Мы ищем файлы встроенного по в каталоге сборки)=====================
           FIRMWARE_FILE=$(find "$BUILD_DIR" -name "*.uf2" -o -name "*.hex" -o -name "*.bin" | head -n 1)
     
           if [ -z "$FIRMWARE_FILE" ]; then
