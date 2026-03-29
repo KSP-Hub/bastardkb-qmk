@@ -5,13 +5,10 @@
 #define ONESHOT_TAP_TOGGLE 2
 #define ONESHOT_TIMEOUT 1000
 
-// Добавить RGB-конфигурацию для раскладки
-#ifdef RGB_MATRIX_ENABLE
-#   define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
-#   define RGB_MATRIX_STARTUP_HUE 0
-#   define RGB_MATRIX_STARTUP_SAT 255
-#   define RGB_MATRIX_STARTUP_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS
-#endif
+#define RP2040_BOOTLOADER 1
 
-// Увеличить количество слоев
+#define USE_SERIAL
+
+// Increasing the number of layers
+
 #define DYNAMIC_KEYMAP_LAYER_COUNT 3
