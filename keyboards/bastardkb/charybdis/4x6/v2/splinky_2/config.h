@@ -11,6 +11,7 @@
 
 /* Handedness */
 #define MASTER_RIGHT
+#define SPLIT_HAND_PIN GP24
 
 /* VBUS detection */
 #define USB_VBUS_PIN GP25
