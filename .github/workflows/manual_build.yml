@@ -18,63 +18,46 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      # =====================Checkout repository=====================
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      # =====================Set up Python=====================
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
     
-      # =====================Install system dependencies (Установка системных зависимостей)=====================
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git python3-pip
-
-          # =====================ARM tools for RP2040=====================
-
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
-
-          # =====================AVR tools (QMK is required even for ARM builds)=====================
-
           sudo apt-get install -y avr-libc avrdude binutils-avr dfu-programmer dfu-util gcc-avr
-          
-          # =====================Additional tools for Pico SDK=====================
-
           sudo apt-get install -y libusb-1.0-0-dev libusb-dev
 
-      # =====================Install QMK dependencies=====================
+      # ИСПРАВЛЕНО: Сначала устанавливаем зависимости, потом QMK
       - name: Install QMK dependencies
         run: |
-          # =====================First, install appdirs explicitly (Сначала устанавливаем appdirs явно)=====================
-          python3 -m pip install --user qmk
-
-          # =====================Installing dependencies BEFORE installing QMK (Установка зависимостей ДО установки QMK)=====================
+          # Сначала устанавливаем все зависимости из requirements
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-dev.txt
           
-          # =====================Installation QMK=====================
+          # Теперь устанавливаем QMK
           python3 -m pip install --user qmk
           
-          # =====================Adding qmk to the PATH for the current step (Добавление qmk в PATH для всех последующих шагов)=====================
+          # Добавляем qmk в PATH
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-          # =====================Checking the QMK installation (Проверка установки QMK)=====================
+          
+          # Проверяем установку
           which qmk
           qmk --version
           
-          # =====================Configuring the QMK Environment (Настройка среды QMK)=====================
+          # Настраиваем окружение
           qmk setup -y
           qmk setup -y pico
           qmk setup -y arm-none-eabi
           
-          # =====================Checking the environment (ignoring minor errors)=====================
-          qmk doctor || echo "qmk doctor found minor issues, but continuing..."
-
-      # =====================Checking the QMK configuration=====================
+          # Проверяем окружение
+          qmk doctor || echo "qmk doctor found minor issues"
 
       - name: Verify QMK configuration
         run: |
@@ -82,88 +65,32 @@ jobs:
           qmk config user.keymap=${{ github.event.inputs.keymap }}
           qmk config
 
-      # =====================QMK Environmental check=====================
-
-      - name: Verify QMK environment
+      # ИСПРАВЛЕНО: Корректное определение пути к файлу прошивки
+      - name: Determine firmware path
+        id: firmware-path
         run: |
-          qmk config user.keyboard=${{ github.event.inputs.keyboard }}
-          qmk config user.keymap=${{ github.event.inputs.keymap }}
-          qmk config
-
-      # =====================Defining the firmware file name=====================
-      - name: Determine firmware filename
-        id: firmware-filename
-        run: |
+          # Заменяем слеши на подчеркивания в пути к клавиатуре
+          KEYBOARD_PATH=$(echo "${{ github.event.inputs.keyboard }}" | tr '/' '_')
+          FIRMWARE_FILE=".build/${KEYBOARD_PATH}_${{ github.event.inputs.keymap }}.uf2"
           
-          # =====================We use the standard QMK path for firmware (Используем стандартный путь QMK для прошивок)=====================
-          FIRMWARE_FILE=".build/${{ github.event.inputs.keyboard }}_${{github.event.inputs.keymap }}.uf2"
-    
           if [ ! -f "$FIRMWARE_FILE" ]; then
-          # =====================Let's try an alternative way (Попробуем альтернативный путь)=====================
-          FIRMWARE_FILE=".build/${{ github.event.inputs.keyboard }}_${{ github.event.inputs.keymap }}.hex"
+            FIRMWARE_FILE=".build/${KEYBOARD_PATH}_${{ github.event.inputs.keymap }}.hex"
           fi
-    
+          
           if [ ! -f "$FIRMWARE_FILE" ]; then
             echo "Firmware file not found!"
             exit 1
           fi
-    
-          echo "FIRMWARE_PATH=$FIRMWARE_FILE" >> $GITHUB_OUTPUT
-          echo "Firmware will be at: $FIRMWARE_FILE"
-      
-      # =====================Determining the path to the firmware=====================
-      - name: Determine firmware path
-        id: firmware-path
-        run: |
-          # =====================Dynamically determine the path to the firmware file (Динамическое определение пути к файлу встроенного ПО)=====================
-          BUILD_DIR=$(qmk path | grep "Build directory" | awk '{print $3}')
-          if [ -z "$BUILD_DIR" ]; then
-            echo "Build directory not found in qmk path output"
-            exit 1
-          fi
-    
-          # =====================We are looking for the firmware files in the build directory (Мы ищем файлы встроенного по в каталоге сборки)=====================
-          FIRMWARE_FILE=$(find "$BUILD_DIR" -name "*.uf2" -o -name "*.hex" -o -name "*.bin" | head -n 1)
-    
-          if [ -z "$FIRMWARE_FILE" ]; then
-            echo "Firmware file not found in $BUILD_DIR!"
-            exit 1
-          fi
-    
-          echo "FIRMWARE_PATH=$FIRMWARE_FILE" >> $GITHUB_OUTPUT
-          echo "Firmware will be at: $FIRMWARE_FILE"
-
-      # =====================Compilation of the firmware=====================
-      - name: Compile firmware
-        id: compile
-        run: |
-          echo "Compiling firmware for ${{ github.event.inputs.keyboard }} with keymap ${{ github.event.inputs.keymap }}"
-          qmk -v compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }} 2>&1 | tee compile.log
-          EXIT_CODE=${PIPESTATUS[0]}
-          echo "Compilation completed with exit code $EXIT_CODE"
           
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "::error::Compilation failed with exit code $EXIT_CODE"
-            echo "Detailed error log:"
-            cat compile.log
-            exit $EXIT_CODE
-          fi
+          echo "FIRMWARE_PATH=$FIRMWARE_FILE" >> $GITHUB_OUTPUT
+          echo "Firmware will be at: $FIRMWARE_FILE"
 
-          echo "Compiling firmware for ${{ github.event.inputs.keyboard }} with keymap ${{ github.event.inputs.keymap }}"
-          if ! qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}; then
-            echo "::error::Compilation failed"
-            cat .build/*.log || true
-            exit 1
-          fi
-
-      # =====================Checking for compilation errors=====================
-      - name: Check for compilation errors
-        if: failure()
+      - name: Compile firmware
         run: |
-          echo "Compilation failed. Checking for common issues..."
-          grep -i "error" compile.log || echo "No errors found in log"
+          echo "Compiling firmware for ${{ github.event.inputs.keyboard }} with keymap ${{ github.event.inputs.keymap }}"
+          qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
 
-      # =====================DIAGNOSTIC STEP (CRITICAL)=====================
+      # Диагностический шаг (оставьте как есть для отладки)
       - name: DIAGNOSTIC Check build directory contents
         if: always()
         run: |
@@ -191,10 +118,8 @@ jobs:
           
           echo "==================== END OF DIAGNOSTIC ===================="
 
-      # =====================Upload firmware=====================
-
       - name: Upload firmware
-        if: "success() && steps.compile.conclusion == 'success'"
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: firmware
