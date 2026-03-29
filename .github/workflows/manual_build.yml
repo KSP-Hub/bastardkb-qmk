@@ -24,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'  # Изменено с 3.12 на 3.11 для совместимости с QMK
+          python-version: '3.12'
     
       - name: Install system dependencies
         run: |
@@ -39,9 +39,6 @@ jobs:
           # Сначала устанавливаем все зависимости из requirements
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-dev.txt
-          
-          # Проверяем установку критических зависимостей
-          python3 -c "import appdirs; print('appdirs installed successfully')"
           
           # Теперь устанавливаем QMK
           python3 -m pip install --user qmk
@@ -59,17 +56,12 @@ jobs:
           qmk setup -y arm-none-eabi
           
           # Проверяем окружение
-          qmk doctor || echo "qmk doctor found minor issues"
+          qmk doctor || echo "qmk doctor found minor issues, but continuing..."
 
-      - name: Update submodules
+      - name: Initialize submodules
         run: |
+          # Инициализируем подмодули (qmk setup уже делает это, но на всякий случай)
           git submodule update --init --recursive
-          # Обновим pico-sdk до последней версии
-          cd lib/pico-sdk
-          git fetch
-          git checkout master
-          git pull
-          cd ../..
 
       - name: Compile firmware
         run: |
