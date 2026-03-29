@@ -10,5 +10,5 @@
 #define USE_SERIAL
 
 // Increasing the number of layers
-
+#define LAYER_STATE_16BIT
 #define DYNAMIC_KEYMAP_LAYER_COUNT 3
