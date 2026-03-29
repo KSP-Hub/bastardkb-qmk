@@ -34,7 +34,6 @@ jobs:
           sudo apt-get install -y avr-libc avrdude binutils-avr dfu-programmer dfu-util gcc-avr
           sudo apt-get install -y libusb-1.0-0-dev libusb-dev
 
-      # ИСПРАВЛЕНО: Сначала устанавливаем зависимости, потом QMK
       - name: Install QMK dependencies
         run: |
           # Сначала устанавливаем все зависимости из requirements
@@ -59,13 +58,15 @@ jobs:
           # Проверяем окружение
           qmk doctor || echo "qmk doctor found minor issues"
 
-      - name: Verify QMK configuration
-        run: |
-          qmk config user.keyboard=${{ github.event.inputs.keyboard }}
-          qmk config user.keymap=${{ github.event.inputs.keymap }}
-          qmk config
+      # УДАЛЕН ШАГ: Verify QMK configuration
+      # Он не обязателен для компиляции и вызывает ошибку
 
-      # ИСПРАВЛЕНО: Корректное определение пути к файлу прошивки
+      - name: Compile firmware
+        run: |
+          echo "Compiling firmware for ${{ github.event.inputs.keyboard }} with keymap ${{ github.event.inputs.keymap }}"
+          qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+
+      # Перемещаем определение пути к прошивке ПОСЛЕ компиляции
       - name: Determine firmware path
         id: firmware-path
         run: |
@@ -85,12 +86,7 @@ jobs:
           echo "FIRMWARE_PATH=$FIRMWARE_FILE" >> $GITHUB_OUTPUT
           echo "Firmware will be at: $FIRMWARE_FILE"
 
-      - name: Compile firmware
-        run: |
-          echo "Compiling firmware for ${{ github.event.inputs.keyboard }} with keymap ${{ github.event.inputs.keymap }}"
-          qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
-
-      # Диагностический шаг (оставьте как есть для отладки)
+      # Диагностический шаг
       - name: DIAGNOSTIC Check build directory contents
         if: always()
         run: |
