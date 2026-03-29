@@ -1,7 +1,7 @@
 #ifdef VIA_ENABLE
 #    include "via.h"
-#    ifndef LAYER_STATE_8BIT
-#        define LAYER_STATE_8BIT
+#    ifndef LAYER_STATE_16BIT
+#        define LAYER_STATE_16BIT
 #    endif
 #endif
 
