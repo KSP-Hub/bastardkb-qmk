@@ -24,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.11'  # Изменено с 3.12 на 3.11 для совместимости с QMK
     
       - name: Install system dependencies
         run: |
@@ -39,6 +39,9 @@ jobs:
           # Сначала устанавливаем все зависимости из requirements
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-dev.txt
+          
+          # Проверяем установку критических зависимостей
+          python3 -c "import appdirs; print('appdirs installed successfully')"
           
           # Теперь устанавливаем QMK
           python3 -m pip install --user qmk
@@ -58,16 +61,24 @@ jobs:
           # Проверяем окружение
           qmk doctor || echo "qmk doctor found minor issues"
 
-      # УДАЛЕН ШАГ: Verify QMK configuration
-      # Он не обязателен для компиляции и вызывает ошибку
+      - name: Update submodules
+        run: |
+          git submodule update --init --recursive
+          # Обновим pico-sdk до последней версии
+          cd lib/pico-sdk
+          git fetch
+          git checkout master
+          git pull
+          cd ../..
 
       - name: Compile firmware
         run: |
           echo "Compiling firmware for ${{ github.event.inputs.keyboard }} with keymap ${{ github.event.inputs.keymap }}"
-          qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+          qmk compile -v -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
 
       # Перемещаем определение пути к прошивке ПОСЛЕ компиляции
       - name: Determine firmware path
+        if: success()
         id: firmware-path
         run: |
           # Заменяем слеши на подчеркивания в пути к клавиатуре
