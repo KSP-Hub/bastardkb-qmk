@@ -9,8 +9,14 @@
 
 #ifdef RGB_MATRIX_ENABLE
 void keyboard_post_init_user(void) {
-    rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
-    rgb_matrix_set_color_all(RGB_WHITE);
+    #ifdef MASTER_RIGHT
+    if (is_keyboard_master()) {
+    #else
+    if (is_keyboard_left()) {
+    #endif
+        rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
+        rgb_matrix_set_color_all(RGB_WHITE);
+    }
 }
 #endif
 
@@ -48,14 +54,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #ifdef VIA_ENABLE
 void via_custom_set_value(uint8_t page_id, uint8_t slot_id, uint8_t data[]) {
-    // Custom config values
+    // =====================Custom config values=====================
 }
 
 void via_custom_get_value(uint8_t page_id, uint8_t slot_id, uint8_t *data) {
-    // Custom config values
+    // =====================Custom config values=====================
 }
 
 void via_custom_save(void) {
-    // Save custom config values
+    // =====================Save custom config values=====================
 }
 #endif
