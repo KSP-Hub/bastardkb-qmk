@@ -149,6 +149,13 @@ jobs:
             exit $EXIT_CODE
           fi
 
+          echo "Compiling firmware for ${{ github.event.inputs.keyboard }} with keymap ${{ github.event.inputs.keymap }}"
+          if ! qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}; then
+            echo "::error::Compilation failed"
+            cat .build/*.log || true
+            exit 1
+          fi
+
       # =====================Checking for compilation errors=====================
       - name: Check for compilation errors
         if: failure()
