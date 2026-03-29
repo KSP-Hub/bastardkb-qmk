@@ -55,13 +55,20 @@ jobs:
           qmk setup -y pico
           qmk setup -y arm-none-eabi
           
-          # Проверяем окружение
-          qmk doctor || echo "qmk doctor found minor issues, but continuing..."
+          # Проверяем окружение (игнорируем незначительные ошибки)
+          qmk doctor || true
 
       - name: Initialize submodules
         run: |
           # Инициализируем подмодули (qmk setup уже делает это, но на всякий случай)
           git submodule update --init --recursive
+
+      - name: Set keyboard and keymap configuration
+        run: |
+          qmk config user.keyboard=${{ github.event.inputs.keyboard }}
+          qmk config user.keymap=${{ github.event.inputs.keymap }}
+          # Проверяем конфигурацию
+          qmk config | grep -E "user\.keyboard|user\.keymap"
 
       - name: Compile firmware
         run: |
