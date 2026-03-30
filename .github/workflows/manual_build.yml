@@ -41,26 +41,32 @@ jobs:
           python3 -m pip install -r requirements-dev.txt
           
           # Теперь устанавливаем QMK
-          python3 -m pip install qmk
+          python3 -m pip install --user qmk
           
           # Добавляем qmk в PATH
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          
+
+      - name: Verify QMK installation
+        run: |
           # Проверяем установку
           which qmk
           qmk --version
           
-          # Настраиваем окружение
-          qmk setup -y
-          qmk setup -y pico
-          qmk setup -y arm-none-eabi
+          # Проверяем окружение
+          qmk doctor || echo "qmk doctor found minor issues (expected)"
+
+      - name: Configure QMK
+        run: |
+          # Устанавливаем клавиатуру и раскладку
+          qmk config user.keyboard=${{ github.event.inputs.keyboard }}
+          qmk config user.keymap=${{ github.event.inputs.keymap }}
           
-          # Проверяем окружение (игнорируем незначительные ошибки)
-          qmk doctor || true
+          # Проверяем конфигурацию
+          qmk config
 
       - name: Initialize submodules
         run: |
-          # Инициализируем подмодули (qmk setup уже делает это, но на всякий случай)
+          # Инициализируем подмодули
           git submodule update --init --recursive
 
       - name: Compile firmware
