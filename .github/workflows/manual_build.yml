@@ -58,9 +58,8 @@ jobs:
       - name: Configure QMK
         run: |
           # Устанавливаем клавиатуру и раскладку
-          qmk config user.keyboard=${{ github.event.inputs.keyboard }}
-          qmk config user.keymap=${{ github.event.inputs.keymap }}
-          
+          qmk config user.keyboard=bastardkb/charybdis/4x6/rp2040
+          qmk config user.keymap=wellum
           # Проверяем конфигурацию
           qmk config
 
