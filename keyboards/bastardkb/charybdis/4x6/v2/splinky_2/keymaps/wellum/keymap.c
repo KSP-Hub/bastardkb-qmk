@@ -10,7 +10,7 @@
 #ifdef RGB_MATRIX_ENABLE
 void keyboard_post_init_user(void) {
     #ifdef MASTER_RIGHT
-    if (is_keyboard_master()) {
+    if (is_keyboard_right()) {
     #else
     if (is_keyboard_left()) {
     #endif
