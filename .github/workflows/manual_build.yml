@@ -20,12 +20,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-    
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -39,10 +39,10 @@ jobs:
           # Сначала устанавливаем все зависимости из requirements
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-dev.txt
-          
+
           # Теперь устанавливаем QMK
           python3 -m pip install --user qmk
-          
+
           # Добавляем qmk в PATH
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
@@ -51,7 +51,7 @@ jobs:
           # Проверяем установку
           which qmk
           qmk --version
-          
+
           # Проверяем окружение
           qmk doctor || echo "qmk doctor found minor issues (expected)"
 
@@ -81,16 +81,16 @@ jobs:
           # Заменяем слеши на подчеркивания в пути к клавиатуре
           KEYBOARD_PATH=$(echo "${{ github.event.inputs.keyboard }}" | tr '/' '_')
           FIRMWARE_FILE=".build/${KEYBOARD_PATH}_${{ github.event.inputs.keymap }}.uf2"
-          
+
           if [ ! -f "$FIRMWARE_FILE" ]; then
             FIRMWARE_FILE=".build/${KEYBOARD_PATH}_${{ github.event.inputs.keymap }}.hex"
           fi
-          
+
           if [ ! -f "$FIRMWARE_FILE" ]; then
             echo "Firmware file not found!"
             exit 1
           fi
-          
+
           echo "FIRMWARE_PATH=$FIRMWARE_FILE" >> $GITHUB_OUTPUT
           echo "Firmware will be at: $FIRMWARE_FILE"
 
@@ -101,29 +101,29 @@ jobs:
           echo "==================== DIAGNOSTIC INFORMATION ===================="
           echo "Current working directory:"
           pwd
-          
+
           echo -e "\nDirectory structure of workspace:"
           ls -la
-          
+
           echo -e "\nChecking if .build directory exists:"
           if [ -d ".build" ]; then
             echo ".build directory exists!"
             echo -e "\nContents of .build directory:"
             ls -laR .build
-            
+
             echo -e "\nSearching for firmware files in .build:"
             find .build -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
           else
             echo ".build directory DOES NOT EXIST!"
           fi
-          
+
           echo -e "\nSearching for firmware files in entire workspace:"
           find . -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
-          
+
           echo "==================== END OF DIAGNOSTIC ===================="
 
       - name: Upload firmware
-        if: success()
+        if: success() && steps.compile.conclusion == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: firmware
