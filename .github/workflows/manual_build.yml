@@ -99,6 +99,13 @@ jobs:
         if: always()
         run: |
           echo "==================== DIAGNOSTIC INFORMATION ===================="
+
+          # ==================== Checking the contents of the compilation file ===================
+          if [ -f "compile.log" ]; then
+            echo -e "\nLast 20 lines of compile.log:"
+            tail -n 20 compile.log
+          fi
+
           echo "Current working directory:"
           pwd
 
