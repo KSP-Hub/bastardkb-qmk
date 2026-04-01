@@ -9,6 +9,9 @@
 
 #define USE_SERIAL
 
+/* Soft Serial configuration for split keyboard */
+#define SOFT_SERIAL_PIN GP1
+
 // Increasing the number of layers
 #define LAYER_STATE_16BIT
 #define DYNAMIC_KEYMAP_LAYER_COUNT 3
