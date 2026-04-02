@@ -1,46 +1,31 @@
-#include QMK_KEYBOARD_H
-
-#ifdef VIA_ENABLE
-#    include "via.h"
-#endif
-
-// Настройка подсветки: при включении будет белый цвет
-#ifdef RGB_MATRIX_ENABLE
-void keyboard_post_init_user(void) {
-    if (is_keyboard_master()) {
-        rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
-        rgb_matrix_set_color_all(RGB_WHITE);
+{
+    "keyboard_name": "Charybdis (4x6) Splinky Custom",
+    "manufacturer": "BastardKB",
+    "url": "https://bastardkb.com",
+    "maintainer": "wellum",
+    "processor": "RP2040",
+    "bootloader": "rp2040",
+    "usb": {
+        "vid": "0x535A",
+        "pid": "0x0002",
+        "device_version": "2.0.0"
+    },
+    "matrix_pins": {
+        "cols": ["GP27", "GP28", "GP15", "GP6", "GP7", "GP8"],
+        "rows": ["GP29", "GP26", "GP5", "GP4", "GP9"]
+    },
+    "diode_direction": "ROW2COL",
+    "split": {
+        "enabled": true,
+        "soft_serial_pin": "GP1"
+    },
+    "ws2812": {
+        "pin": "GP0",
+        "driver": "vendor"
+    },
+    "features": {
+        "mousekey": true,
+        "pointing_device": true,
+        "rgb_matrix": true
     }
 }
-#endif
-
-enum layer_names {
-    _BASE,
-    _FN1,
-    _FN2
-};
-
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_BASE] = LAYOUT_charybdis_4x6(
-        // Левая сторона (физически 29 клавиш)
-        KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,
-        KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,
-        KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,
-        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,
-                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-
-        // Правая сторона (физически 27 клавиш)
-        KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC, KC_ENT,
-        KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT, KC_RSFT,
-        KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_ESC,  KC_SPC,
-        KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,
-                          KC_TRNS, KC_TRNS, KC_TRNS
-    )
-};
-
-// Заглушки для функций VIA
-#ifdef VIA_ENABLE
-void via_custom_set_value(uint8_t page_id, uint8_t slot_id, uint8_t data[]) { }
-void via_custom_get_value(uint8_t page_id, uint8_t slot_id, uint8_t *data) { }
-void via_custom_save(void) { }
-#endif
