@@ -8,6 +8,7 @@ MOUSEKEY_ENABLE = yes
 POINTING_DEVICE_DRIVER = pmw3360
 RGB_MATRIX_ENABLE = yes
 
-# Настройки трекбола (исправляют текущую ошибку)
+# Настройки трекбола:
+# Указываем конкретный драйвер для трекбола Charybdis
 POINTING_DEVICE_DRIVER = pmw3360
 SERIAL_DRIVER = vendor
