@@ -1,14 +1,14 @@
 {
-    "keyboard_name": "Charybdis (4x6) Splinky",
+    "keyboard_name": "Charybdis (4x6) Splinky Custom",
     "manufacturer": "BastardKB",
+    "url": "https://bastardkb.com",
+    "maintainer": "wellum",
+    "processor": "RP2040",
+    "bootloader": "rp2040",
     "usb": {
-        "device_version": "2.0.0",
         "vid": "0x535A",
         "pid": "0x0002",
-        "device_name": "Charybdis Splinky"
-    },
-    "rgb_matrix": {
-        "driver": "ws2812"
+        "device_version": "2.0.0"
     },
     "matrix_pins": {
         "cols": ["GP27", "GP28", "GP15", "GP6", "GP7", "GP8"],
@@ -16,20 +16,16 @@
     },
     "diode_direction": "ROW2COL",
     "split": {
-        "split_side": "right",
-        "split_keyboard_pre_init": true,
-        "split_flip": false,
+        "enabled": true,
         "soft_serial_pin": "GP1"
     },
     "ws2812": {
         "pin": "GP0",
         "driver": "vendor"
     },
-    "processor": "RP2040",
-    "bootloader": "rp2040",
-    "output": "USB",
-    "matrix_size": {
-        "cols": 6,
-        "rows": 5
+    "features": {
+        "mousekey": true,
+        "pointing_device": true,
+        "rgb_matrix": true
     }
 }
