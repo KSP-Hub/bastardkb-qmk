@@ -10,3 +10,8 @@
 #define RGB_MATRIX_LED_COUNT 58
 // Пин для связи между половинками
 #define SOFT_SERIAL_PIN GP1
+// Настройки SPI для трекбола (датчик PMW3360)
+#define PMW3360_CS_PIN GP13
+#define SPI_SCK_PIN GP10
+#define SPI_MISO_PIN GP12
+#define SPI_MOSI_PIN GP11
