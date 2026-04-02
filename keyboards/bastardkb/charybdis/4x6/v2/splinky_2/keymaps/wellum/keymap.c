@@ -27,7 +27,7 @@ enum layer_names {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_BASE] = LAYOUT_5x6(
+    [_BASE] = LAYOUT_4x6(
         KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,
         KC_LSFT, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,
@@ -35,7 +35,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LGUI, KC_LALT, KC_SPC,  MO(_FN1),MO(_FN2),KC_ENT
     ),
 
-    [_FN1] = LAYOUT_5x6(
+    [_FN1] = LAYOUT_4x6(
         _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______,
@@ -43,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, MO(_BASE),_______, KC_TRNS
     ),
 
-    [_FN2] = LAYOUT_5x6(
+    [_FN2] = LAYOUT_4x6(
         _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______,
