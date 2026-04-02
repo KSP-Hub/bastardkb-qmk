@@ -4,135 +4,41 @@ on:
   workflow_dispatch:
     inputs:
       keyboard:
-        description: 'Keyboard path (e.g. "bastardkb/charybdis/4x6/v2/splinky_2")'
+        description: 'Keyboard path'
         required: true
         default: 'bastardkb/charybdis/4x6/v2/splinky_2'
       keymap:
-        description: 'Keymap name (e.g. "wellum")'
+        description: 'Keymap name'
         required: true
         default: 'wellum'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
+      # 1. Скачиваем репозиторий вместе со всеми зависимостями (ChibiOS для RP2040)
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          submodules: recursive
 
-      - name: Install system dependencies
+      # 2. Устанавливаем компилятор для ARM (процессор RP2040) и сам QMK
+      - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git python3-pip
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
-          sudo apt-get install -y avr-libc avrdude binutils-avr dfu-programmer dfu-util gcc-avr
-          sudo apt-get install -y libusb-1.0-0-dev libusb-dev
+          python3 -m pip install qmk
 
-      - name: Install QMK dependencies
-        run: |
-          # Сначала устанавливаем все зависимости из requirements
-          python3 -m pip install -r requirements.txt
-          python3 -m pip install -r requirements-dev.txt
-
-          # Теперь устанавливаем QMK
-          python3 -m pip install --user qmk
-
-          # Добавляем qmk в PATH
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Verify QMK installation
-        run: |
-          # Проверяем установку
-          which qmk
-          qmk --version
-
-          # Проверяем окружение
-          qmk doctor || echo "qmk doctor found minor issues (expected)"
-
-      - name: Configure QMK
-        run: |
-          # Устанавливаем клавиатуру и раскладку
-          qmk config user.keyboard=bastardkb/charybdis/4x6/rp2040
-          qmk config user.keymap=wellum
-          # Проверяем конфигурацию
-          qmk config
-
-      - name: Initialize submodules
-        run: |
-          # Инициализируем подмодули
-          git submodule update --init --recursive
-
+      # 3. Подготовка и запуск компиляции
       - name: Compile firmware
         run: |
-          echo "Compiling firmware for ${{ github.event.inputs.keyboard }} with keymap ${{ github.event.inputs.keymap }}"
-          qmk compile -v -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+          qmk setup -y
+          qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
 
-      # Перемещаем определение пути к прошивке ПОСЛЕ компиляции
-      - name: Determine firmware path
-        if: success()
-        id: firmware-path
-        run: |
-          # Заменяем слеши на подчеркивания в пути к клавиатуре
-          KEYBOARD_PATH=$(echo "${{ github.event.inputs.keyboard }}" | tr '/' '_')
-          FIRMWARE_FILE=".build/${KEYBOARD_PATH}_${{ github.event.inputs.keymap }}.uf2"
-
-          if [ ! -f "$FIRMWARE_FILE" ]; then
-            FIRMWARE_FILE=".build/${KEYBOARD_PATH}_${{ github.event.inputs.keymap }}.hex"
-          fi
-
-          if [ ! -f "$FIRMWARE_FILE" ]; then
-            echo "Firmware file not found!"
-            exit 1
-          fi
-
-          echo "FIRMWARE_PATH=$FIRMWARE_FILE" >> $GITHUB_OUTPUT
-          echo "Firmware will be at: $FIRMWARE_FILE"
-
-      # Диагностический шаг
-      - name: DIAGNOSTIC Check build directory contents
-        if: always()
-        run: |
-          echo "==================== DIAGNOSTIC INFORMATION ===================="
-
-          # ==================== Checking the contents of the compilation file ===================
-          if [ -f "compile.log" ]; then
-            echo -e "\nLast 20 lines of compile.log:"
-            tail -n 20 compile.log
-          fi
-
-          echo "Current working directory:"
-          pwd
-
-          echo -e "\nDirectory structure of workspace:"
-          ls -la
-
-          echo -e "\nChecking if .build directory exists:"
-          if [ -d ".build" ]; then
-            echo ".build directory exists!"
-            echo -e "\nContents of .build directory:"
-            ls -laR .build
-
-            echo -e "\nSearching for firmware files in .build:"
-            find .build -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
-          else
-            echo ".build directory DOES NOT EXIST!"
-          fi
-
-          echo -e "\nSearching for firmware files in entire workspace:"
-          find . -name "*.uf2" -o -name "*.hex" -o -name "*.bin"
-
-          echo "==================== END OF DIAGNOSTIC ===================="
-
+      # 4. Сохраняем готовый файл .uf2 в артефакты сборки
       - name: Upload firmware
-        if: success() && steps.compile.conclusion == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: ${{ steps.firmware-path.outputs.FIRMWARE_PATH }}
+          path: "*.uf2"
           if-no-files-found: error
