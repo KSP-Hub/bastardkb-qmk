@@ -5,11 +5,11 @@
 #define SPLIT_USB_DETECT
 #define MASTER_RIGHT
 
-// МАТРИЦА (Корректные параметры для Charybdis 4x6 Split)
-// Указываем параметры ОДНОЙ половины, QMK сам удвоит их для сплита
-#define MATRIX_ROWS 4
+// МАТРИЦА (Юбилейная настройка для 100-й итерации)
+#define MATRIX_ROWS 8
 #define MATRIX_COLS 6
-#define MATRIX_ROW_PINS { GP22, GP20, GP23, GP21 }
+// Указываем пины для одной стороны, остальные QMK подтянет сам через SPLIT
+#define MATRIX_ROW_PINS { GP22, GP20, GP23, GP21, NO_PIN, NO_PIN, NO_PIN, NO_PIN }
 #define MATRIX_COL_PINS { GP19, GP18, GP15, GP14, GP16, GP26 }
 #define DIODE_DIRECTION COL2ROW
 
