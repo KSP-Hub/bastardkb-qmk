@@ -25,34 +25,14 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip p7zip-full
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
           python3 -m pip install qmk
 
-      - name: Prepare ChibiOS & Contrib
-        run: |
-          qmk setup -y
-          # Распаковка
-          find lib/chibios -name "*.7z" -exec 7z x -y {} -o$(dirname {}) \; || true
-          find lib/chibios-contrib -name "*.7z" -exec 7z x -y {} -o$(dirname {}) \; || true
-
-          # СОЗДАЕМ ПУТЬ, КОТОРЫЙ ИЩЕТ GMAKE
-          # Создаем недостающую директорию
-          mkdir -p lib/chibios-contrib/os/hal/boards/GENERIC_RP2040
-
-          # Копируем (или линкуем) туда нужный файл из портов
-          cp lib/chibios-contrib/os/hal/ports/RP/RP2040/board.mk lib/chibios-contrib/os/hal/boards/GENERIC_RP2040/board.mk || true
-
-          qmk git-submodule
+      - name: QMK Setup
+        run: qmk setup -y
 
       - name: Compile firmware
         run: |
-          # ЗАДАЕМ ПЕРЕМЕННЫЕ ИЗ ВАШЕГО PLATFORM.MK
-          export CHIBIOS=$(pwd)/lib/chibios
-          export CHIBIOS_CONTRIB=$(pwd)/lib/chibios-contrib
-          # Для совместимости с разными версиями скриптов:
-          export CH_PATH=$CHIBIOS
-          export CHC_PATH=$CHIBIOS_CONTRIB
-
           qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
 
       - name: Upload firmware
