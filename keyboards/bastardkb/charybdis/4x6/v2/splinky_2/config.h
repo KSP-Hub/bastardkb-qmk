@@ -21,6 +21,5 @@
 #define SPI_MISO_PIN GP12
 #define SPI_MOSI_PIN GP11
 
-// Пин для RGB светодиодов (WS2812)
-#define RGB_DI_PIN GP0
-#define WS2812_DI_PIN RGB_DI_PIN
+// Прямое указание пина для драйвера
+#define WS2812_DI_PIN GP0
