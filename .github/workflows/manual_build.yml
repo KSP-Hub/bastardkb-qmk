@@ -35,9 +35,18 @@ jobs:
         run: |
           qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
 
-      - name: Upload firmware
+          # ====== ХЛЕБНЫЕ КРОШКИ (Безопасный сбор данных) ======
+          # Сохраняем финальные настройки пинов и макросов в один файл
+          find .build -name "info_config.h" -exec cp {} build_diag_config.txt \; || echo "No config found"
+          # Сохраняем список всех скомпилированных объектов (чтобы видеть драйверы)
+          ls -R .build > build_files_list.txt || echo "No build folder"
+
+      - name: Upload firmware and logs
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-${{ github.event.inputs.keymap }}
-          path: "**/*.uf2"
+          name: firmware-and-diagnostics
+          # Сохраняем прошивку (.uf2) и наши крошки (.txt)
+          path: |
+            *.uf2
+            *.txt
           if-no-files-found: error
