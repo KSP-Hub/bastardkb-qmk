@@ -5,14 +5,15 @@
 #define SPLIT_USB_DETECT
 #define MASTER_RIGHT
 
-// МАТРИЦА (Настройки для Charybdis 4x6 на Splinky)
-#define MATRIX_ROWS 8  // 4 ряда на каждую сторону
-#define MATRIX_COLS 6  // 6 столбцов на каждую сторону
+// МАТРИЦА (Корректные параметры для Charybdis 4x6 Split)
+// Указываем параметры ОДНОЙ половины, QMK сам удвоит их для сплита
+#define MATRIX_ROWS 4
+#define MATRIX_COLS 6
 #define MATRIX_ROW_PINS { GP22, GP20, GP23, GP21 }
 #define MATRIX_COL_PINS { GP19, GP18, GP15, GP14, GP16, GP26 }
 #define DIODE_DIRECTION COL2ROW
 
-// ТРЕКБОЛ (SPI настройки для PMW3360)
+// ТРЕКБОЛ (SPI настройки)
 #define PMW33XX_CS_PIN GP13
 #define SPI_SCK_PIN GP10
 #define SPI_MISO_PIN GP12
