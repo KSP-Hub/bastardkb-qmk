@@ -1,6 +1,6 @@
 # Платформа для Splinky (RP2040)
 MCU = RP2040
-BOARD = GENERIC_RP2040
+BOARD = GENERIC_RP_RP2040
 
 # Включаем основные функции
 SPLIT_KEYBOARD = yes
