@@ -31,9 +31,17 @@ jobs:
       - name: Prepare ChibiOS & Contrib
         run: |
           qmk setup -y
-          # Распаковка архивов 7z (как требует lgtm.yml и README)
+          # Распаковка
           find lib/chibios -name "*.7z" -exec 7z x -y {} -o$(dirname {}) \; || true
           find lib/chibios-contrib -name "*.7z" -exec 7z x -y {} -o$(dirname {}) \; || true
+
+          # СОЗДАЕМ ПУТЬ, КОТОРЫЙ ИЩЕТ GMAKE
+          # Создаем недостающую директорию
+          mkdir -p lib/chibios-contrib/os/hal/boards/GENERIC_RP2040
+
+          # Копируем (или линкуем) туда нужный файл из портов
+          cp lib/chibios-contrib/os/hal/ports/RP/RP2040/board.mk lib/chibios-contrib/os/hal/boards/GENERIC_RP2040/board.mk || true
+
           qmk git-submodule
 
       - name: Compile firmware
