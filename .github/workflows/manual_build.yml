@@ -25,22 +25,31 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip p7zip-full
           python3 -m pip install qmk
 
-      - name: QMK Setup & Submodule Sync
+      - name: Prepare ChibiOS & Contrib
         run: |
           qmk setup -y
-          git submodule update --init --recursive
-          make git-submodule
+          # Распаковка архивов 7z (как требует lgtm.yml и README)
+          find lib/chibios -name "*.7z" -exec 7z x -y {} -o$(dirname {}) \; || true
+          find lib/chibios-contrib -name "*.7z" -exec 7z x -y {} -o$(dirname {}) \; || true
+          qmk git-submodule
 
       - name: Compile firmware
         run: |
+          # ЗАДАЕМ ПЕРЕМЕННЫЕ ИЗ ВАШЕГО PLATFORM.MK
+          export CHIBIOS=$(pwd)/lib/chibios
+          export CHIBIOS_CONTRIB=$(pwd)/lib/chibios-contrib
+          # Для совместимости с разными версиями скриптов:
+          export CH_PATH=$CHIBIOS
+          export CHC_PATH=$CHIBIOS_CONTRIB
+
           qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
           name: firmware-${{ github.event.inputs.keymap }}
-          path: "*.uf2"
+          path: "**/*.uf2"
           if-no-files-found: error
