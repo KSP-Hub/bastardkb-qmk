@@ -1,37 +1,43 @@
 name: QMK_Build
-
 on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout User Repo
-        uses: actions/checkout@v4
-        with:
-          path: user_repo
+    - name: Checkout User Repo
+      uses: actions/checkout@v4
+      with:
+        path: user_repo
 
-      - name: Install Toolchain
-        run: |
-          sudo apt update
-          sudo apt install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
-          python3 -m pip install --user qmk
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+    - name: Install Toolchain
+      run: |
+        sudo apt update
+        sudo apt install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
+        python3 -m pip install --user qmk
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Clone QMK and Sync
-        run: |
-          # 1. Клонируем официальную базу QMK (Upstream)
-          git clone --depth 1 https://github.com qmk_firmware
+    - name: Clone QMK and Sync
+      run: |
+        # 1. Клонируем официальную базу QMK (Upstream) — ИСПРАВЛЕНО!
+        git clone --depth 1 https://github.com/qmk/qmk_firmware.git qmk_firmware
 
-          # 2. Переносим ваши файлы (включая bastardkb/charybdis/4x6/keymaps/wellum)
-          cp -r user_repo/keyboards/bastardkb qmk_firmware/keyboards/
+        # 2. Переносим ваши файлы
+        cp -r user_repo/keyboards/bastardkb qmk_firmware/keyboards/
 
-          # 3. Инициализируем зависимости для RP2040 (pico-sdk)
-          cd qmk_firmware
-          make git-submodule
+        # 3. Инициализируем зависимости для RP2040
+        cd qmk_firmware
+        make git-submodule
 
-      - name: Compile
-        run: |
-          cd qmk_firmware
-          # -kb указывает на папку клавиатуры, -km на папку с вашей раскладкой wellum
-          qmk compile -kb bastardkb/charybdis/4x6 -km wellum
+    - name: Compile
+      run: |
+        cd qmk_firmware
+        qmk compile -kb bastardkb/charybdis/4x6/v2/splinky_2 -km wellum
+
+    - name: Upload firmware
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: qmk_firmware/*.uf2
+        if-no-files-found: error
