@@ -15,16 +15,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
           python3 -m pip install qmk milc
-          # Скачиваем "заводской" QMK
-          git clone https://github.com /home/runner/qmk_firmware
+
+          # ИСПРАВЛЕННАЯ СТРОКА КЛОНИРОВАНИЯ
+          git clone --depth 1 https://github.com /home/runner/qmk_firmware
+
           qmk config user.qmk_home=/home/runner/qmk_firmware
-          # Говорим QMK искать твою папку keyboards в текущем месте
+          # Указываем твой текущий репозиторий как оверлей
           qmk config user.overlay_dir=$(pwd)
+
+          # Синхронизируем подмодули внутри скачанного QMK
+          cd /home/runner/qmk_firmware
           qmk git-submodule
 
       - name: Compile & Breadcrumbs
         run: |
-          # Собираем твою раскладку wellum на базе стандартного 4x6
+          # Собираем твою раскладку wellum
           qmk compile -kb bastardkb/charybdis/4x6 -km wellum
 
           # Сбор хлебных крошек
@@ -37,3 +42,4 @@ jobs:
           path: |
             *.uf2
             *.txt
+          if-no-files-found: error
