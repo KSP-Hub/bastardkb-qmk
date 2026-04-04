@@ -20,7 +20,7 @@ jobs:
 
       - name: Clone QMK Firmware
         run: |
-          git clone --recursive https://github.com /home/runner/qmk_firmware
+          git clone --recursive https://github.com/home/runner/qmk_firmware
           cd /home/runner/qmk_firmware
           qmk setup -y qmk/qmk_firmware
 
