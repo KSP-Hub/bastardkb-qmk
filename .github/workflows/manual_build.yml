@@ -1,4 +1,4 @@
-name: QMK Build (Clean Overlay)
+name: QMK Build (Official Setup)
 
 on:
   workflow_dispatch:
@@ -10,39 +10,34 @@ jobs:
       - name: Checkout your files
         uses: actions/checkout@v4
 
-      - name: Setup Clean QMK Environment
+      - name: Setup QMK Environment
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
-          python3 -m pip install --upgrade pip
           python3 -m pip install qmk milc appdirs
 
-          # Явное указание полного пути к репозиторию
-          git clone --depth 1 https://github.com /home/runner/qmk_firmware
+          # ВМЕСТО GIT CLONE: Используем официальную инициализацию
+          # Она сама скачает qmk_firmware в правильное место
+          qmk setup -y -home /home/runner/qmk_firmware
 
           qmk config user.qmk_home=/home/runner/qmk_firmware
           qmk config user.overlay_dir=$(pwd)
 
-          # Установка зависимостей самого QMK
-          python3 -m pip install -r /home/runner/qmk_firmware/requirements.txt
-
+          # Синхронизируем подмодули
           cd /home/runner/qmk_firmware
           qmk git-submodule
 
       - name: Compile & Breadcrumbs
         run: |
-          # Запуск компиляции
           qmk compile -kb bastardkb/charybdis/4x6 -km wellum
 
           mkdir -p diagnostics
           find .build -name "info_config.h" -exec cp {} diagnostics/build_config.txt \; || echo "No config found"
-          ls -R .build > diagnostics/files_list.txt || echo "No build folder"
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: charybdis-final-v117
+          name: charybdis-final-v118
           path: |
             *.uf2
             diagnostics/*.txt
-          if-no-files-found: error
