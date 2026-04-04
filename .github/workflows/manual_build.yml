@@ -1,4 +1,4 @@
-name: QMK Build
+name: QMK Build (Vendor Style)
 
 on:
   workflow_dispatch:
@@ -6,47 +6,46 @@ on:
       keyboard:
         description: 'Keyboard path'
         required: true
-        default: 'bastardkb/charybdis/4x6/v2/splinky_2'
+        default: 'bastardkb/charybdis/4x6'
       keymap:
         description: 'Keymap name'
         required: true
-        default: 'wellum'
+        default: 'vendor'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout UserSpace
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
 
-      - name: Install Dependencies
+      - name: Install QMK & Setup
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
-          python3 -m pip install qmk
+          python3 -m pip install qmk milc
+          # Клонируем чистое ядро QMK в домашнюю папку
+          git clone https://github.com/qmk/qmk_firmware.git /home/runner/qmk_firmware
+          qmk config user.qmk_home=/home/runner/qmk_firmware
+          # Указываем, что наш текущий репозиторий — это оверлей
+          qmk config user.overlay_dir=$(pwd)
+          qmk git-submodule
 
-      - name: QMK Setup
-        run: qmk setup -y
-
-      - name: Compile firmware
+      - name: Compile & Collect Breadcrumbs
         run: |
           qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
 
-          # ====== ХЛЕБНЫЕ КРОШКИ (Безопасный сбор данных) ======
-          # Сохраняем финальные настройки пинов и макросов в один файл
-          find .build -name "info_config.h" -exec cp {} build_diag_config.txt \; || echo "No config found"
-          # Сохраняем список всех скомпилированных объектов (чтобы видеть драйверы)
+          # ====== ХЛЕБНЫЕ КРОШКИ (Сбор диагностики) ======
+          echo "=== Отчет по пинам из сборки ===" > build_diag_vendor.txt
+          find .build -name "info_config.h" -exec grep "#define" {} >> build_diag_vendor.txt \; || echo "No config"
           ls -R .build > build_files_list.txt || echo "No build folder"
 
       - name: Upload firmware and logs
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-and-diagnostics
-          # Сохраняем прошивку (.uf2) и наши крошки (.txt)
+          name: charybdis-vendor-firmware
           path: |
             *.uf2
             *.txt
           if-no-files-found: error
+ы
