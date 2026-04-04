@@ -14,23 +14,24 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
-          python3 -m pip install qmk milc
+          python3 -m pip install --upgrade pip
+          # Устанавливаем qmk и недостающие зависимости (appdirs и другие)
+          python3 -m pip install qmk milc appdirs
 
-          # ИСПРАВЛЕННАЯ СТРОКА: Полный путь к репозиторию
-          git clone --depth 1 https://github.com/qmk/qmk_firmware.git /home/runner/qmk_firmware
-
+          git clone --depth 1 https://github.com /home/runner/qmk_firmware
           qmk config user.qmk_home=/home/runner/qmk_firmware
           qmk config user.overlay_dir=$(pwd)
+
+          # Устанавливаем зависимости самого QMK, чтобы он не ругался
+          python3 -m pip install -r /home/runner/qmk_firmware/requirements.txt
 
           cd /home/runner/qmk_firmware
           qmk git-submodule
 
       - name: Compile & Breadcrumbs
         run: |
-          # Собираем твою раскладку wellum
           qmk compile -kb bastardkb/charybdis/4x6 -km wellum
 
-          # Сбор хлебных крошек
           mkdir -p diagnostics
           find .build -name "info_config.h" -exec cp {} diagnostics/build_config.txt \; || echo "No config"
           ls -R .build > diagnostics/files_list.txt || echo "No build folder"
@@ -38,7 +39,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: charybdis-final-v115
+          name: charybdis-final-v116
           path: |
             *.uf2
             diagnostics/*.txt
