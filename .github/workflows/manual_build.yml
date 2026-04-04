@@ -16,23 +16,23 @@ jobs:
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
           python3 -m pip install qmk milc
 
-          # Клонируем основной репозиторий QMK
+          # Клонируем основной репозиторий QMK (ИСПРАВЛЕННЫЙ АДРЕС)
           git clone --depth 1 https://github.com /home/runner/qmk_firmware
 
           # Настраиваем конфигурацию QMK
           qmk config user.qmk_home=/home/runner/qmk_firmware
           qmk config user.overlay_dir=$(pwd)
 
-          # Синхронизируем подмодули (ChibiOS и прочее)
+          # Синхронизируем подмодули
           cd /home/runner/qmk_firmware
           qmk git-submodule
 
       - name: Compile & Breadcrumbs
         run: |
-          # Собираем прошивку
+          # Собираем прошивку wellum
           qmk compile -kb bastardkb/charybdis/4x6 -km wellum
 
-          # Сбор хлебных крошек для диагностики
+          # Сбор хлебных крошек
           mkdir -p diagnostics
           find .build -name "info_config.h" -exec cp {} diagnostics/build_config.txt \; || echo "No config found"
           ls -R .build > diagnostics/files_list.txt || echo "No build folder"
@@ -40,7 +40,7 @@ jobs:
       - name: Upload firmware and breadcrumbs
         uses: actions/upload-artifact@v4
         with:
-          name: charybdis-final-v109
+          name: charybdis-final-v110
           path: |
             *.uf2
             diagnostics/*.txt
