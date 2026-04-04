@@ -1,4 +1,4 @@
-name: QMK Build (Official Setup)
+name: QMK Build (Docker Strategy)
 
 on:
   workflow_dispatch:
@@ -6,38 +6,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Используем официальный образ QMK — в нем уже есть всё!
+    container: qmkfm/qmk_cli
     steps:
-      - name: Checkout your files
+      - name: Checkout your repo
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Setup QMK Environment
+      - name: Compile Wellum
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
-          python3 -m pip install qmk milc appdirs
-
-          # ВМЕСТО GIT CLONE: Используем официальную инициализацию
-          # Она сама скачает qmk_firmware в правильное место
-          qmk setup -y -home /home/runner/qmk_firmware
-
-          qmk config user.qmk_home=/home/runner/qmk_firmware
-          qmk config user.overlay_dir=$(pwd)
-
-          # Синхронизируем подмодули
-          cd /home/runner/qmk_firmware
-          qmk git-submodule
-
-      - name: Compile & Breadcrumbs
-        run: |
+          # В контейнере qmk setup не качает всё заново, а просто инициализирует
+          qmk setup -y
+          # Собираем твою раскладку
           qmk compile -kb bastardkb/charybdis/4x6 -km wellum
 
-          mkdir -p diagnostics
-          find .build -name "info_config.h" -exec cp {} diagnostics/build_config.txt \; || echo "No config found"
-
-      - name: Upload
+      - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
-          name: charybdis-final-v118
-          path: |
-            *.uf2
-            diagnostics/*.txt
+          name: charybdis-wellum-v119
+          path: "*.uf2"
