@@ -1,51 +1,39 @@
-name: QMK Build (Vendor Style)
+name: QMK Build (Clean Overlay)
 
 on:
   workflow_dispatch:
-    inputs:
-      keyboard:
-        description: 'Keyboard path'
-        required: true
-        default: 'bastardkb/charybdis/4x6'
-      keymap:
-        description: 'Keymap name'
-        required: true
-        default: 'vendor'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout UserSpace
+      - name: Checkout your files
         uses: actions/checkout@v4
 
-      - name: Install QMK & Setup
+      - name: Setup Clean QMK
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
           python3 -m pip install qmk milc
-          # Клонируем чистое ядро QMK в домашнюю папку
-          git clone https://github.com/qmk/qmk_firmware.git /home/runner/qmk_firmware
+          # Скачиваем "заводской" QMK
+          git clone https://github.com /home/runner/qmk_firmware
           qmk config user.qmk_home=/home/runner/qmk_firmware
-          # Указываем, что наш текущий репозиторий — это оверлей
+          # Говорим QMK искать твою папку keyboards в текущем месте
           qmk config user.overlay_dir=$(pwd)
           qmk git-submodule
 
-      - name: Compile & Collect Breadcrumbs
+      - name: Compile & Breadcrumbs
         run: |
-          qmk compile -kb ${{ github.event.inputs.keyboard }} -km ${{ github.event.inputs.keymap }}
+          # Собираем твою раскладку wellum на базе стандартного 4x6
+          qmk compile -kb bastardkb/charybdis/4x6 -km wellum
 
-          # ====== ХЛЕБНЫЕ КРОШКИ (Сбор диагностики) ======
-          echo "=== Отчет по пинам из сборки ===" > build_diag_vendor.txt
-          find .build -name "info_config.h" -exec grep "#define" {} >> build_diag_vendor.txt \; || echo "No config"
-          ls -R .build > build_files_list.txt || echo "No build folder"
+          # Сбор хлебных крошек
+          find .build -name "info_config.h" -exec cp {} build_diag_final.txt \; || echo "No config"
 
-      - name: Upload firmware and logs
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: charybdis-vendor-firmware
+          name: charybdis-final-firmware
           path: |
             *.uf2
             *.txt
-          if-no-files-found: error
-ы
