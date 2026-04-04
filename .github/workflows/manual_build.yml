@@ -1,47 +1,30 @@
-name: QMK Build (Clean Overlay)
+name: Build QMK Firmware
 
-on:
-  workflow_dispatch:
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your files
+      - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Setup Clean QMK Environment
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi python3-pip
-          python3 -m pip install qmk milc
 
-          # Клонируем основной репозиторий QMK (ИСПРАВЛЕННЫЙ АДРЕС)
-          git clone --depth 1 https://github.com /home/runner/qmk_firmware
-
-          # Настраиваем конфигурацию QMK
-          qmk config user.qmk_home=/home/runner/qmk_firmware
-          qmk config user.overlay_dir=$(pwd)
-
-          # Синхронизируем подмодули
-          cd /home/runner/qmk_firmware
-          qmk git-submodule
-
-      - name: Compile & Breadcrumbs
+      - name: Install QMK Python CLI
         run: |
-          # Собираем прошивку wellum
-          qmk compile -kb bastardkb/charybdis/4x6 -km wellum
+          python3 -m pip install --upgrade qmk
 
-          # Сбор хлебных крошек
-          mkdir -p diagnostics
-          find .build -name "info_config.h" -exec cp {} diagnostics/build_config.txt \; || echo "No config found"
-          ls -R .build > diagnostics/files_list.txt || echo "No build folder"
+      - name: Clone QMK Firmware
+        run: |
+          git clone --recursive https://github.com /home/runner/qmk_firmware
+          cd /home/runner/qmk_firmware
+          qmk setup -y qmk/qmk_firmware
 
-      - name: Upload firmware and breadcrumbs
-        uses: actions/upload-artifact@v4
-        with:
-          name: charybdis-final-v110
-          path: |
-            *.uf2
-            diagnostics/*.txt
-          if-no-files-found: error
+      - name: Build Firmware
+        run: |
+          cd /home/runner/qmk_firmware
+          qmk compile -kb <your_keyboard> -km <your_keymap>
