@@ -1,1 +1,2 @@
-# Настройки специфичные только для этой раскладки
+VIA_ENABLE = yes
+RGB_MATRIX_ENABLE = yes
