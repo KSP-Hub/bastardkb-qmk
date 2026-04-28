@@ -16,10 +16,7 @@ jobs:
 
       - name: Compile Wellum
         run: |
-          # В контейнере qmk setup не качает всё заново, а просто инициализирует
-          qmk setup -y
-          # Собираем твою раскладку
-          qmk compile -kb bastardkb/charybdis/4x6 -km wellum
+          qmk compile -kb bastardkb/charybdis/4x6/v2/splinky_2 -km wellum
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
