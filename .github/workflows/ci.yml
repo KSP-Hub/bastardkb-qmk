@@ -4,19 +4,22 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: qmkfm/qmk_cli
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: QMK Build
-        uses: qmk/qmk-action@v5
-        with:
-          command: compile
-          container: ghcr.io/qmk/qmk_cli
-          keyboard: bastardkb/charybdis/4x6/v2/splinky_2
-          keymap: vial
+      - name: Install dependencies
+        run: |
+          pip3 install qmk
+          qmk setup -y
+
+      - name: Compile
+        run: |
+          git config --global --add safe.directory $(pwd)
+          qmk compile -kb bastardkb/charybdis/4x6/v2/splinky_2 -km vial
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
