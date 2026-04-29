@@ -15,6 +15,7 @@ jobs:
         run: |
           pip3 install qmk
           qmk setup -y
+          pip3 install -r requirements.txt
 
       - name: Compile
         run: |
