@@ -6,15 +6,14 @@
 #define ONESHOT_TIMEOUT 1000
 
 #define RP2040_BOOTLOADER 1
-
 #define USE_SERIAL
-
-/* Soft Serial configuration for split keyboard */
 #define SOFT_SERIAL_PIN GP1
 
-// Increasing the number of layers
-#define LAYER_STATE_16BIT
-#define DYNAMIC_KEYMAP_LAYER_COUNT 3
+// Ограничим слои до 4 для экономии RAM (хватит за глаза)
+#define DYNAMIC_KEYMAP_LAYER_COUNT 4
 
-#define VIAL_KEYBOARD_UID {0xBE, 0xEF, 0x42, 0x69, 0x01, 0x02, 0x03, 0x04} // Случайный ID
-#define VIAL_UNLOCK_COMBO {0, 0} // Разблокировка настроек (нажать 0 и 1 клавишу вместе)
+#define VIAL_KEYBOARD_UID {0xBE, 0xEF, 0x42, 0x69, 0x01, 0x02, 0x03, 0x04}
+#define VIAL_UNLOCK_COMBO {0, 0}
+
+// Настройки трекбола
+#define POINTING_DEVICE_ROTATION_90 // Если трекбол инвертирован, удалите или замените
