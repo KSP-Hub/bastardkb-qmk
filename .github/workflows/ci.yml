@@ -24,7 +24,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Charybdis_4x6_Vial
+          name: Charybdis_4x6_Vial_RP2040_PMW3360
           path: |
             *.uf2
             *.bin
