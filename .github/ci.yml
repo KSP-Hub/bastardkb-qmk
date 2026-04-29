@@ -1,0 +1,49 @@
+name: CI
+on: [ pull_request, push, workflow_dispatch ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  check-uid:
+    name: Check Vial UIDs
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+    - name: (actions) Checkout Vial repo
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+
+    - name: Verify Vial UID is unique per-keyboard
+      run: python3 util/ci_vial_verify_uid.py
+
+  build-vial:
+    name: Build Charybdis 4x6 Vial
+    runs-on: ubuntu-latest
+    container: ghcr.io/qmk/qmk_cli@sha256:16c4916e95b99bf88d27b15aec8db409ee17265d1710287fde248c6666508966
+
+    steps:
+    - name: (actions) Checkout Vial repo
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+        submodules: recursive
+
+    - name: Build
+      run: |
+        git config --global --add safe.directory $(pwd)
+        qmk compile -kb bastardkb/charybdis/4x6/v2/splinky_2 -km vial
+
+    - name: Upload firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: Charybdis_4x6_RP2040_Vial_firmware
+        path: |
+          *.uf2
+          *.hex
+          *.bin
