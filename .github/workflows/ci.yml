@@ -1,10 +1,8 @@
 name: CI
-on: [pull_request, push, workflow_dispatch]
-
+on: [ pull_request, push, workflow_dispatch ]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 permissions: {}
 
 jobs:
@@ -15,26 +13,36 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
 
-      - name: Verify Vial UID is unique
+      - name: Verify Vial UID is unique per-keyboard
         run: python3 util/ci_vial_verify_uid.py
 
   build-vial:
     name: Build Charybdis 4x6 Vial
-    runs-on: ubuntu-latest
-    container: ghcr.io/qmk/qmk_cli@sha256:16c4916e95b99bf88d27b15aec8db409ee17265d1710287fde248c6666508966
+    runs-on: ubuntu-latest  # <--- ИЗМЕНЕНО: Убрали контейнер, вернули стандартный runner
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
           submodules: recursive
 
-      - name: Build firmware
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install QMK CLI
+        run: |
+          python -m pip install --upgrade pip
+          pip install qmk
+
+      - name: Initialize QMK
+        run: qmk setup -y
+
+      - name: Build Firmware
         run: |
           git config --global --add safe.directory $(pwd)
+          # ВНИМАНИЕ: Если папка keymaps/vial отсутствует, поменяйте 'vial' на 'wellum'
           qmk compile -kb bastardkb/charybdis/4x6/v2/splinky_2 -km vial
 
       - name: Upload firmware
