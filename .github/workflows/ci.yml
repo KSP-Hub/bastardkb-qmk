@@ -17,14 +17,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-
       - name: Verify Vial UID is unique per-keyboard
         run: python3 util/ci_vial_verify_uid.py
 
   build-vial:
     name: Build Charybdis 4x6 Vial
     runs-on: ubuntu-latest
-    # ВАЖНО: Убрали строку 'container: ...', которая ломала сборку
+    container: ghcr.io/qmk/qmk_cli@sha256:16c4916e95b99bf88d27b15aec8db409ee17265d1710287fde248c6666508966
     steps:
       - name: (actions) Checkout Vial repo
         uses: actions/checkout@v4
@@ -32,35 +31,17 @@ jobs:
           persist-credentials: false
           submodules: recursive
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install QMK CLI
-        run: |
-          python -m pip install --upgrade pip
-          pip install qmk
-
-      - name: Initialize QMK
-        run: qmk setup -y
-
-      - name: Install Dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y gcc-arm-none-eabi avr-gcc avrdude dfu-programmer dfu-util
-          pip install -r requirements.txt
-
       - name: Build
         run: |
           git config --global --add safe.directory $(pwd)
-          qmk compile -kb bastardkb/charybdis/4x6/v2/splinky_2 -km wellum
+          qmk compile -kb bastardkb/charybdis/4x6/v2/splinky_2 -km vial
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
           name: Charybdis_4x6_RP2040_Vial_firmware
           path: |
-            *.uf2
-            *.hex
-            *.bin
+            .build/*.uf2
+            .build/*.hex
+            .build/*.bin
+          if-no-files-found: warn
